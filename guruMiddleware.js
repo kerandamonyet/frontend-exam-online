@@ -23,5 +23,5 @@ export async function middleware(request) {
 
 // Proteksi halaman "/guru"
 export const config = {
-  matcher: ["/guru/:path*"], // Protect all routes under "/guru"
+  matcher: ["/dashboard/:path*"], // Protect all routes under "/dashboard"
 };

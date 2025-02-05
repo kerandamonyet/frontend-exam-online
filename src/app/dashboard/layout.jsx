@@ -1,6 +1,7 @@
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import "../../app/globals.css";
+import NavbarGuru from "../components/guru/NavbarGuru";
 
 export const metadata = {
   title: "SiapUjian | Selamat datang di halaman dashboard guru",
@@ -10,16 +11,17 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+export default function DashboardLayout({ children }) {
   return (
     <html lang="en">
       <head>
         <link rel="logo" href="/logo4.png" />
       </head>
       <body>
-        {/* <Navbar/> */}
-        {children}
-        {/* <Footer/> */}
+        <div className="flex flex-row">
+          <NavbarGuru />
+          {children}
+        </div>
       </body>
     </html>
   );

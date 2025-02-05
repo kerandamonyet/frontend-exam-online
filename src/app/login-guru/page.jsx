@@ -87,7 +87,7 @@ const LoginFormGuru = () => {
         text: "Login berhasil!",
       });
 
-      router.push("/guru");
+      router.push("/dashboard");
     } catch (error) {
       console.error("❌ [LOGIN] Error:", error.response?.data || error.message);
       MySwal.fire({
@@ -121,7 +121,7 @@ const LoginFormGuru = () => {
               name="email"
               id="email"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              placeholder="nama@school.com"
+              placeholder="example@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
