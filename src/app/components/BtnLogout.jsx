@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Cookies from "js-cookie";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation"; // Perbaikan: impor useRouter
+import { BiLogOut } from "react-icons/bi";
 
 function BtnLogout() {
   const [pending, setPending] = useState(false);
@@ -37,14 +38,15 @@ function BtnLogout() {
   };
 
   return (
-    <div>
+    <div className="">
       <button
         type="button"
         onClick={handleLogout}
         disabled={pending}
-        className="w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+        className="relative flex flex-1 justify-center gap-4 w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
       >
-        {pending ? "Logging out..." : "Logout"}
+        <BiLogOut size={20}/>
+        {pending ? "Logging out..." : " Logout"}
       </button>
     </div>
   );

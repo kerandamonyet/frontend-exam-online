@@ -1,7 +1,7 @@
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import "../../app/globals.css";
-import NavbarGuru from "../components/guru/NavbarGuru";
+import NavbarGuru from "../components/dashboard/guru/NavbarGuru";
 
 export const metadata = {
   title: "SiapUjian | Selamat datang di halaman dashboard guru",
@@ -17,11 +17,19 @@ export default function DashboardLayout({ children }) {
       <head>
         <link rel="logo" href="/logo4.png" />
       </head>
-      <body>
-        <div className="flex flex-row">
+      <body className="min-h-screen bg-gray-100">
+        {/* Container layout: kolom di mobile, baris di layar besar */}
+        <div className="flex flex-col lg:flex-row min-h-screen">
+          {/* Sidebar (NavbarGuru) sudah responsif */}
           <NavbarGuru />
-          {children}
+          {/* Konten utama */}
+          <main className="flex-1 p-4 overflow-y-auto">
+            {/* Bungkus children dalam container responsif */}
+            <div className="max-w-7xl mx-auto w-full">{children}</div>
+          </main>
         </div>
+        {/* Footer */}
+        <Footer />
       </body>
     </html>
   );

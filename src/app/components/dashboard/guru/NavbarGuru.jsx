@@ -3,11 +3,14 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import BtnLogout from "../BtnLogout";
+import BtnLogout from "../../BtnLogout";
+import { TbLayoutDashboard, TbClipboardList, TbUsers } from "react-icons/tb";
+import { FaChalkboardTeacher } from "react-icons/fa";
 
 const NavbarGuru = () => {
   const [isOpen, setIsOpen] = useState(false);
 
+  // Atur agar halaman tidak scroll ketika sidebar terbuka (mobile)
   useEffect(() => {
     if (isOpen) {
       document.documentElement.classList.add("overflow-hidden");
@@ -17,10 +20,26 @@ const NavbarGuru = () => {
   }, [isOpen]);
 
   const menuItems = [
-    { name: "Dashboard", href: "/dashboard", icon: "/icon/dashboard.svg" },
-    { name: "Latihan", href: "/dashboard/latihan" },
-    { name: "Siswa", href: "/dashboard/siswa" },
-    { name: "Guru", href: "/dashboard/guru" },
+    {
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: <TbLayoutDashboard className="mr-3" size={20} />,
+    },
+    {
+      name: "Latihan",
+      href: "/dashboard/latihan",
+      icon: <TbClipboardList className="mr-3" size={20} />,
+    },
+    {
+      name: "Siswa",
+      href: "/dashboard/siswa",
+      icon: <TbUsers className="mr-3" size={20} />,
+    },
+    {
+      name: "Guru",
+      href: "/dashboard/guru",
+      icon: <FaChalkboardTeacher className="mr-3" size={20} />,
+    },
   ];
 
   return (
@@ -52,12 +71,20 @@ const NavbarGuru = () => {
         )}
       </button>
 
+      {/* Overlay untuk mobile */}
+      {isOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black opacity-50 z-30"
+          onClick={() => setIsOpen(false)}
+        ></div>
+      )}
+
       {/* Sidebar */}
       <aside
-        className={` p-4 fixed inset-y-0 left-0 w-1/4 bg-[#000957] shadow-lg z-40 transform transition-transform duration-200 ease-in-out 
+        className={`p-4 fixed inset-y-0 left-0 bg-[#000957] shadow-lg z-40 transform transition-transform duration-200 ease-in-out 
           ${
             isOpen ? "translate-x-0" : "-translate-x-full"
-          } lg:translate-x-0 lg:static lg:inset-0`}
+          } w-4/5 md:w-1/3 lg:w-1/4 lg:translate-x-0 lg:static lg:inset-0`}
       >
         <div className="p-6 border-b">
           <h1 className="text-2xl font-bold text-white">SiapUjian</h1>
@@ -68,15 +95,10 @@ const NavbarGuru = () => {
             <Link
               key={index}
               href={item.href}
+              onClick={() => setIsOpen(false)}
               className="flex items-center w-full px-4 py-2 font-light text-white rounded-lg hover:bg-gray-100 hover:text-[#000957] hover:font-bold group"
             >
-              <Image
-                src={item.icon}
-                alt={item.name}
-                width={20}
-                height={20}
-                className=" aside-icon mr-3 transition-all duration-200 group-hover:fill-[#000957]"
-              />
+              {item.icon && <span>{item.icon}</span>}
               <span className="flex-1">{item.name}</span>
             </Link>
           ))}
