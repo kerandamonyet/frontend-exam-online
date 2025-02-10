@@ -1,26 +1,26 @@
 "use client";
 import { useState, useEffect } from "react";
-import { getGuru } from "../../../../lib/data";
-import GuruTable from "../../components/dashboard/guru/GuruTable";
-import Pagination from "@/app/components/dashboard/guru/Paginitation";
-import Search from "@/app/components/dashboard/guru/Search";
-import { CreateButton } from "@/app/components/dashboard/guru/Button";
-import NavbarGuru from "@/app/components/dashboard/NavbarGuru";
+import { getLatihan, getSiswa } from "../../../../lib/data";
+import LatihanTable from "@/app/components/dashboard/latihan/LatihanTable";
+import Pagination from "@/app/components/dashboard/latihan/Paginitation";
+import Search from "@/app/components/dashboard/latihan/Search";
 import AuthGuard from "@/app/components/AuthGuard";
+import { IoAddSharp } from "react-icons/io5";
+import Link from "next/link";
 
-function GuruPage() {
-  const [guru, setGuru] = useState([]);
+function LatihanPage() {
+  const [latihan, setLatihan] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 5;
 
-  const fetchGuru = async () => {
+  const fetchLatihan = async () => {
     setLoading(true);
     try {
-      const { data, totalPages } = await getGuru(currentPage, itemsPerPage);
-      setGuru(data);
+      const { data, totalPages } = await getLatihan(currentPage, itemsPerPage);
+      setLatihan(data);
       setTotalPages(totalPages);
     } catch (error) {
       setError(error.message);
@@ -30,7 +30,7 @@ function GuruPage() {
   };
 
   useEffect(() => {
-    fetchGuru();
+    fetchLatihan();
   }, [currentPage]);
 
   return (
@@ -38,12 +38,17 @@ function GuruPage() {
       <div className="max-w-screen-md w-full mx-auto mt-5">
         <div className="flex items-center justify-between gap-1 mb-5">
           <Search />
-          <CreateButton onSubmit={fetchGuru} />{" "}
+          <Link href="/dashboard/latihan/create">
+            <button className="inline-flex items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 px-5 py-[9px] rounded-sm text-sm">
+              <IoAddSharp size={20} />
+              Create
+            </button>
+          </Link>
           {/* Perbarui tabel setelah create */}
         </div>
-        <GuruTable
-          data={guru}
-          setData={setGuru}
+        <LatihanTable
+          data={latihan}
+          setData={setLatihan}
           currentPage={currentPage}
           itemsPerPage={itemsPerPage}
         />
@@ -62,4 +67,4 @@ function GuruPage() {
   );
 }
 
-export default GuruPage;
+export default LatihanPage;

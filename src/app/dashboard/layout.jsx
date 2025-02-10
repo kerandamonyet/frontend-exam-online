@@ -1,7 +1,7 @@
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import "../../app/globals.css";
-import NavbarGuru from "../components/dashboard/guru/NavbarGuru";
+import NavbarGuru from "../components/dashboard/NavbarGuru";
 
 export const metadata = {
   title: "SiapUjian | Selamat datang di halaman dashboard guru",

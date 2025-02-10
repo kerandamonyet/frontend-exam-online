@@ -3,9 +3,10 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import BtnLogout from "../../BtnLogout";
+import BtnLogout from "../BtnLogout";
 import { TbLayoutDashboard, TbClipboardList, TbUsers } from "react-icons/tb";
 import { FaChalkboardTeacher } from "react-icons/fa";
+import { MdOutlineQuiz } from "react-icons/md";
 
 const NavbarGuru = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,6 +30,11 @@ const NavbarGuru = () => {
       name: "Latihan",
       href: "/dashboard/latihan",
       icon: <TbClipboardList className="mr-3" size={20} />,
+    },
+    {
+      name: "Soal",
+      href: "/dashboard/soal",
+      icon: <MdOutlineQuiz className="mr-3" size={20} />,
     },
     {
       name: "Siswa",

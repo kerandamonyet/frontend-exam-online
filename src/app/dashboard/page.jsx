@@ -3,7 +3,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import BtnLogout from "../components/BtnLogout";
 import AuthGuard from "../components/AuthGuard";
-import NavbarGuru from "../components/dashboard/guru/NavbarGuru";
+import NavbarGuru from "../components/dashboard/NavbarGuru";
 import Card from "../components/dashboard/Card";
 
 const DashboardGuru = () => {
