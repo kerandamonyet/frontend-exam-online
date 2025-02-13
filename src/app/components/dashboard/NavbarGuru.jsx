@@ -7,11 +7,12 @@ import BtnLogout from "../BtnLogout";
 import { TbLayoutDashboard, TbClipboardList, TbUsers } from "react-icons/tb";
 import { FaChalkboardTeacher } from "react-icons/fa";
 import { MdOutlineQuiz } from "react-icons/md";
+import { usePathname } from "next/navigation";
 
 const NavbarGuru = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
-  // Atur agar halaman tidak scroll ketika sidebar terbuka (mobile)
   useEffect(() => {
     if (isOpen) {
       document.documentElement.classList.add("overflow-hidden");
@@ -24,27 +25,23 @@ const NavbarGuru = () => {
     {
       name: "Dashboard",
       href: "/dashboard",
-      icon: <TbLayoutDashboard className="mr-3" size={20} />,
+      icon: <TbLayoutDashboard size={20} />,
     },
     {
       name: "Latihan",
       href: "/dashboard/latihan",
-      icon: <TbClipboardList className="mr-3" size={20} />,
+      icon: <TbClipboardList size={20} />,
     },
     {
       name: "Soal",
       href: "/dashboard/soal",
-      icon: <MdOutlineQuiz className="mr-3" size={20} />,
+      icon: <MdOutlineQuiz size={20} />,
     },
-    {
-      name: "Siswa",
-      href: "/dashboard/siswa",
-      icon: <TbUsers className="mr-3" size={20} />,
-    },
+    { name: "Siswa", href: "/dashboard/siswa", icon: <TbUsers size={20} /> },
     {
       name: "Guru",
       href: "/dashboard/guru",
-      icon: <FaChalkboardTeacher className="mr-3" size={20} />,
+      icon: <FaChalkboardTeacher size={20} />,
     },
   ];
 
@@ -56,25 +53,13 @@ const NavbarGuru = () => {
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle Sidebar"
       >
-        {isOpen ? (
-          <Image
-            src="/icon/X-icon.svg"
-            alt="Close menu"
-            width={24}
-            height={24}
-            priority
-            className="w-6 h-6"
-          />
-        ) : (
-          <Image
-            src="/icon/hamburger-icon.svg"
-            alt="Open menu"
-            width={24}
-            height={24}
-            priority
-            className="w-6 h-6"
-          />
-        )}
+        <Image
+          src={isOpen ? "/icon/X-icon.svg" : "/icon/hamburger-icon.svg"}
+          alt="Menu Toggle"
+          width={24}
+          height={24}
+          className="w-6 h-6"
+        />
       </button>
 
       {/* Overlay untuk mobile */}
@@ -87,27 +72,34 @@ const NavbarGuru = () => {
 
       {/* Sidebar */}
       <aside
-        className={`p-4 fixed inset-y-0 left-0 bg-[#000957] shadow-lg z-40 transform transition-transform duration-200 ease-in-out 
-          ${
-            isOpen ? "translate-x-0" : "-translate-x-full"
-          } w-4/5 md:w-1/3 lg:w-1/4 lg:translate-x-0 lg:static lg:inset-0`}
+        className={`fixed inset-y-0 left-0 bg-[#000957] shadow-lg z-40 transform transition-transform duration-200 ease-in-out 
+          ${isOpen ? "translate-x-0" : "-translate-x-full"} 
+          w-4/5 md:w-1/3 lg:w-1/4 lg:translate-x-0 lg:static`}
       >
-        <div className="p-6 border-b">
+        <div className="p-6 border-b border-gray-600">
           <h1 className="text-2xl font-bold text-white">SiapUjian</h1>
         </div>
 
-        <nav className="px-4 space-y-1 mt-4">
-          {menuItems.map((item, index) => (
-            <Link
-              key={index}
-              href={item.href}
-              onClick={() => setIsOpen(false)}
-              className="flex items-center w-full px-4 py-2 font-light text-white rounded-lg hover:bg-gray-100 hover:text-[#000957] hover:font-bold group"
-            >
-              {item.icon && <span>{item.icon}</span>}
-              <span className="flex-1">{item.name}</span>
-            </Link>
-          ))}
+        <nav className="px-4 space-y-2 mt-4">
+          {menuItems.map((item, index) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={index}
+                href={item.href}
+                onClick={() => setIsOpen(false)}
+                className={`flex items-center px-4 py-2 rounded-lg transition-all duration-200 
+                  ${
+                    isActive
+                      ? "bg-gray-200 text-[#000957] font-semibold"
+                      : "text-white hover:bg-gray-100 hover:text-[#000957]"
+                  }`}
+              >
+                <span className="mr-3">{item.icon}</span>
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
           <BtnLogout />
         </nav>
       </aside>

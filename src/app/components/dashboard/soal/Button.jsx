@@ -5,7 +5,6 @@ import { IoAddSharp, IoPencil, IoTrashOutline } from "react-icons/io5";
 import Swal from "sweetalert2";
 import { getLatihan, deleteLatihan } from "../../../../../lib/data";
 
-
 // export const DetailButton = () => {
 //   return (
 //     <Link href="/dashboard/latihan/detail">
@@ -40,7 +39,7 @@ export const EditButton = ({ latihan, onUpdate }) => {
           console.log("Membuka modal edit");
           setModalOpen(true);
         }}
-        className="inline-flex items-center space-x-1 text-white px-5 py-[9px] rounded-md text-sm"
+        className="inline-flex items-center space-x-1 text-white bg-green-700 hover:bg-green-800 px-5 py-[9px] rounded-md text-sm"
       >
         <IoPencil size={20} />
       </button>
@@ -94,7 +93,7 @@ export const DeleteButton = ({ id, onDelete }) => {
     <button
       type="button"
       onClick={handleDelete}
-      className="inline-flex items-center space-x-1 text-white px-5 py-[9px] rounded-md text-sm"
+      className="inline-flex items-center space-x-1 text-white  bg-red-700 hover:bg-red-800 px-5 py-[9px] rounded-md text-sm"
     >
       <IoTrashOutline size={20} />
     </button>

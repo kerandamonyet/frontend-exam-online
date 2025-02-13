@@ -7,9 +7,9 @@ import { getLatihan, deleteLatihan } from "../../../../../lib/data";
 import { FaEye } from "react-icons/fa6";
 import Link from "next/link";
 
-export const DetailButton = () => {
+export const DetailButton = ({ id }) => {
   return (
-    <Link href="/dashboard/latihan/detail">
+    <Link href={`/dashboard/latihan/detail/${id}`} passHref>
       <button className="inline-flex items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 px-5 py-[9px] rounded-md text-sm">
         <FaEye size={20} />
       </button>

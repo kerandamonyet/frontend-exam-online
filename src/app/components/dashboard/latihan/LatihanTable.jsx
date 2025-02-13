@@ -63,7 +63,7 @@ function LatihanTable({ data, setData, currentPage, itemsPerPage }) {
                   : "Tidak ada tanggal"}
               </td>
               <td className="flex justify-center gap-1 py-2 px-3">
-                <DetailButton />
+                <DetailButton id={latihan.id_latihan} />
                 <EditButton latihan={latihan} onUpdate={handleUpdate} />
                 <DeleteButton id={latihan.id_latihan} onDelete={handleDelete} />
               </td>
