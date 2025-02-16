@@ -5,8 +5,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import BtnLogout from "../BtnLogout";
 import { TbLayoutDashboard, TbClipboardList, TbUsers } from "react-icons/tb";
-import { FaChalkboardTeacher } from "react-icons/fa";
+import { FaChalkboardTeacher, FaSchool } from "react-icons/fa";
 import { MdOutlineQuiz } from "react-icons/md";
+
 import { usePathname } from "next/navigation";
 
 const NavbarGuru = () => {
@@ -33,11 +34,15 @@ const NavbarGuru = () => {
       icon: <TbClipboardList size={20} />,
     },
     {
-      name: "Soal",
-      href: "/dashboard/soal",
-      icon: <MdOutlineQuiz size={20} />,
+      name: "Kelas",
+      href: "/dashboard/kelas",
+      icon: <FaSchool size={20} />,
     },
-    { name: "Siswa", href: "/dashboard/siswa", icon: <TbUsers size={20} /> },
+    {
+      name: "Siswa",
+      href: "/dashboard/siswa",
+      icon: <TbUsers size={20} />,
+    },
     {
       name: "Guru",
       href: "/dashboard/guru",

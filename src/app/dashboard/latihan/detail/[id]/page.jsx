@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getLatihanById } from "../../../../../../lib/data";
 import { formatDate } from "../../../../../../utils/formatDate";
-import SoalTable from "@/app/components/dashboard/soal/SoalTable";
+import SoalTable from "@/app/components/dashboard/kelas/SoalTable";
 import AuthGuard from "@/app/components/AuthGuard";
 
 function DetailPage() {

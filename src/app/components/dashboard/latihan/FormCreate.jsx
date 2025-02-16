@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Link from "next/link";
 
 const MySwal = withReactContent(Swal);
 
@@ -227,8 +228,16 @@ function FormCreate({ onSubmit }) {
           </div>
         </div>
 
-        {/* Tombol Submit */}
+        {/* Tombol action */}
         <div className="flex justify-end space-x-2">
+          <Link href="/dashboard/latihan">
+            <button
+              type="button"
+              disabled={pending}
+              className='px-4 py-2 text-white bg-gray-400 rounded'>
+              Kembali
+            </button>
+          </Link>
           <button
             type="submit"
             disabled={pending}

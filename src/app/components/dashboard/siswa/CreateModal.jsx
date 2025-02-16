@@ -1,56 +1,79 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import Datepicker from "flowbite-datepicker"; // Pastikan paket sudah terinstal dan dikonfigurasi
 
 const MySwal = withReactContent(Swal);
 
-function CreateModal({ isOpen, onClose, onSubmit, siswa }) {
+function CreateModal({ isOpen, onClose, onSubmit }) {
   if (!isOpen) return null;
 
-  // Inisialisasi state dengan field yang relevan untuk siswa
   const [formData, setFormData] = useState({
     nama_siswa: "",
-    kelas: "",
     jenis_kelamin: "",
     tgl_lahir: "",
-    role_id: 1,
+    kelas_id: "",
+    role_id: "",
   });
 
   const [errors, setErrors] = useState({});
   const [pending, setPending] = useState(false);
+  const [kelasList, setKelasList] = useState([]); // Inisialisasi sebagai array kosong
+  const [roleList, setRoleList] = useState([]); // Inisialisasi sebagai array kosong
+
+  // Ambil daftar kelas dari database saat modal dibuka
+  useEffect(() => {
+    if (isOpen) {
+      axios
+        .get("http://localhost:5000/api/kelas")
+        .then((res) => {
+          console.log("Data dari API:", res.data); // Debugging
+          setKelasList(
+            Array.isArray(res.data) ? res.data : res.data.data || []
+          );
+        })
+        .catch((err) => {
+          console.error("Error fetching kelas:", err);
+          setKelasList([]); // Hindari crash jika error
+        });
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      axios
+        .get("http://localhost:5000/api/role")
+        .then((res) => {
+          console.log("Data dari API:", res.data); // Debugging
+          setRoleList(Array.isArray(res.data) ? res.data : res.data.data || []);
+        })
+        .catch((err) => {
+          console.error("Error fetching role:", err);
+          setRoleList([]); // Hindari crash jika error
+        });
+    }
+  }, [isOpen]);
 
   // Validasi Form
   const validate = () => {
     let newErrors = {};
-
-    // Cek apakah nama siswa kosong
     if (!formData.nama_siswa.trim()) {
       newErrors.nama_siswa = "Nama siswa wajib diisi";
     }
-
-    // Cek apakah kelas kosong
-    if (!formData.kelas.trim()) {
-      newErrors.kelas = "Kelas wajib diisi";
+    if (!formData.kelas_id.trim()) {
+      newErrors.kelas_id = "Kelas ID wajib diisi";
     }
-
-    // Cek apakah jenis kelamin kosong
     if (!formData.jenis_kelamin.trim()) {
       newErrors.jenis_kelamin = "Jenis kelamin wajib diisi";
     }
-
-    // Cek apakah tanggal lahir kosong
     if (!formData.tgl_lahir.trim()) {
       newErrors.tgl_lahir = "Tanggal lahir wajib diisi";
     }
 
-    // Cek apakah role_id kosong atau tidak valid
-    if (!formData.role_id || formData.role_id <= 0) {
-      newErrors.role_id = "Role ID wajib diisi dan harus lebih dari 0";
+    if (!formData.role_id.trim()) {
+      newErrors.role_id = "Tanggal lahir wajib diisi";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -59,7 +82,6 @@ function CreateModal({ isOpen, onClose, onSubmit, siswa }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Hapus error terkait field yang diubah
     setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
   };
 
@@ -70,29 +92,27 @@ function CreateModal({ isOpen, onClose, onSubmit, siswa }) {
     setPending(true);
 
     try {
-      // Kirim data siswa ke API
       await axios.post("http://localhost:5000/api/siswa", {
         nama_siswa: formData.nama_siswa,
-        kelas: formData.kelas,
         jenis_kelamin: formData.jenis_kelamin,
         tgl_lahir: formData.tgl_lahir,
+        kelas_id: formData.kelas_id,
         role_id: formData.role_id,
       });
 
-      // Panggil callback refresh data dari parent
       onSubmit();
       MySwal.fire({
         icon: "success",
         title: "Berhasil!",
         text: "Siswa berhasil ditambahkan!",
       });
-      // Reset form data
+
       setFormData({
         nama_siswa: "",
-        kelas: "",
         jenis_kelamin: "",
         tgl_lahir: "",
-        role_id: 1,
+        kelas_id: "",
+        role_id: "",
       });
       onClose();
     } catch (error) {
@@ -138,58 +158,51 @@ function CreateModal({ isOpen, onClose, onSubmit, siswa }) {
             )}
           </div>
 
-          {/* Kelas */}
+          {/* Kelas ID (Dropdown) */}
           <div>
             <label className="block text-sm font-medium">Kelas</label>
-            <input
-              type="text"
-              name="kelas"
-              placeholder="A"
-              required
-              value={formData.kelas}
+            <select
+              name="kelas_id"
+              value={formData.kelas_id}
               onChange={handleChange}
               className={`w-full p-2 border rounded ${
-                errors.kelas ? "border-red-500" : "border-gray-300"
+                errors.kelas_id ? "border-red-500" : "border-gray-300"
               }`}
-            />
-            {errors.kelas && (
-              <p className="text-red-500 text-sm mt-1">{errors.kelas}</p>
+            >
+              <option value="">Pilih Kelas</option>
+              {kelasList.map((kelas) => (
+                <option key={kelas.id} value={kelas.id}>
+                  {kelas.nama_kelas}
+                </option>
+              ))}
+            </select>
+            {errors.kelas_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.kelas_id}</p>
             )}
           </div>
 
           {/* Jenis Kelamin */}
           <div>
             <label className="block text-sm font-medium">Jenis Kelamin</label>
-            <div className="flex items-center mb-4">
-              <input
-                id="radio-laki"
-                type="radio"
-                value="Laki-laki"
-                name="jenis_kelamin"
-                onChange={handleChange}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              />
-              <label
-                htmlFor="radio-laki"
-                className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-              >
+            <div className="flex gap-4">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  value="Laki-laki"
+                  name="jenis_kelamin"
+                  onChange={handleChange}
+                  className="mr-2"
+                />
                 Laki-laki
               </label>
-            </div>
-            <div className="flex items-center">
-              <input
-                defaultChecked
-                id="radio-perempuan"
-                type="radio"
-                value="Perempuan"
-                name="jenis_kelamin"
-                onChange={handleChange}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              />
-              <label
-                htmlFor="radio-perempuan"
-                className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-              >
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  value="Perempuan"
+                  name="jenis_kelamin"
+                  onChange={handleChange}
+                  className="mr-2"
+                />
                 Perempuan
               </label>
             </div>
@@ -203,49 +216,37 @@ function CreateModal({ isOpen, onClose, onSubmit, siswa }) {
           {/* Tanggal Lahir */}
           <div>
             <label className="block text-sm font-medium">Tanggal Lahir</label>
-            <div className="relative max-w-sm">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg
-                  className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                </svg>
-              </div>
-              <input
-                id="datepicker-format"
-                data-datepicker
-                data-datepicker-format="dd-mm-yyyy"
-                type="text"
-                name="tgl_lahir"
-                value={formData.tgl_lahir}
-                onChange={handleChange}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="dd-mm-yyyy"
-              />
-            </div>
+            <input
+              type="date"
+              name="tgl_lahir"
+              value={formData.tgl_lahir}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border rounded border-gray-300"
+            />
             {errors.tgl_lahir && (
               <p className="text-red-500 text-sm mt-1">{errors.tgl_lahir}</p>
             )}
           </div>
 
-          {/* Role ID */}
+          {/* Role ID (Dropdown) */}
           <div>
-            <label className="block text-sm font-medium">Role ID</label>
-            <input
-              type="number"
+            <label className="block text-sm font-medium">Role</label>
+            <select
               name="role_id"
               value={formData.role_id}
               onChange={handleChange}
-              placeholder="1"
-              required
               className={`w-full p-2 border rounded ${
                 errors.role_id ? "border-red-500" : "border-gray-300"
               }`}
-            />
+            >
+              <option value="">Pilih Role</option>
+              {roleList.map((role) => (
+                <option key={role.role_id} value={role.role_id}>
+                  {role.role_name}
+                </option>
+              ))}
+            </select>
             {errors.role_id && (
               <p className="text-red-500 text-sm mt-1">{errors.role_id}</p>
             )}

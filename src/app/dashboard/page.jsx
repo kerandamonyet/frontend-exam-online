@@ -4,13 +4,19 @@ import BtnLogout from "../components/BtnLogout";
 import AuthGuard from "../components/AuthGuard";
 import StatCard from "../components/dashboard/StatCard";
 import LineChart from "../components/dashboard/LineChart";
-import { FaChalkboardTeacher, FaUserGraduate, FaHome } from "react-icons/fa";
+import {
+  FaChalkboardTeacher,
+  FaUserGraduate,
+  FaHome,
+  FaSchool,
+} from "react-icons/fa";
 import { MdOutlineQuiz } from "react-icons/md";
 
 const DashboardGuru = () => {
   const [stats, setStats] = useState({
     totalGuru: 0,
     totalSiswa: 0,
+    totalKelas: 0,
     totalLatihan: 0,
   });
   const [chartData, setChartData] = useState(null);
@@ -30,6 +36,7 @@ const DashboardGuru = () => {
           setStats({
             totalGuru: data.data.total_guru,
             totalSiswa: data.data.total_siswa,
+            totalKelas: data.data.total_kelas,
             totalLatihan: data.data.total_latihan,
           });
         }
@@ -54,20 +61,26 @@ const DashboardGuru = () => {
               {
                 label: "Total Guru",
                 data: data.data.total_guru,
-                borderColor: "rgba(54, 162, 235, 1)",
+                borderColor: "rgba(54, 162, 235, 1)", // Biru
                 backgroundColor: "rgba(54, 162, 235, 0.2)",
               },
               {
                 label: "Total Siswa",
                 data: data.data.total_siswa,
-                borderColor: "rgba(75, 192, 192, 1)",
+                borderColor: "rgba(75, 192, 192, 1)", // Hijau
                 backgroundColor: "rgba(75, 192, 192, 0.2)",
+              },
+              {
+                label: "Total Kelas",
+                data: data.data.total_kelas,
+                borderColor: "rgba(255, 206, 86, 1)", // Kuning
+                backgroundColor: "rgba(255, 206, 86, 0.2)",
               },
               {
                 label: "Total Latihan",
                 data: data.data.total_latihan,
-                borderColor: "rgba(153, 102, 255, 1)",
-                backgroundColor: "rgba(153, 102, 255, 0.2)",
+                borderColor: "rgba(255, 99, 132, 1)", // Merah
+                backgroundColor: "rgba(255, 99, 132, 0.2)",
               },
             ],
           });
@@ -105,31 +118,38 @@ const DashboardGuru = () => {
           </header>
 
           {/* Statistik Total */}
-          <section className="bg-white p-6 rounded-lg shadow mb-6">
-            <p className="text-gray-700 mb-6">
+          <section className="bg-white p-6 rounded-xl shadow-lg mb-6">
+            <p className="text-gray-700 text-lg font-medium mb-4">
               Selamat datang di Dashboard Guru!
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <StatCard
                 title="Total Guru"
                 total={stats.totalGuru}
                 Icon={FaChalkboardTeacher}
                 detailLink="/dashboard/guru"
-                bgColor="bg-blue-50"
+                bgColor="bg-blue-100"
               />
               <StatCard
                 title="Total Siswa"
                 total={stats.totalSiswa}
                 Icon={FaUserGraduate}
                 detailLink="/dashboard/siswa"
-                bgColor="bg-green-50"
+                bgColor="bg-green-100"
+              />
+              <StatCard
+                title="Total Kelas"
+                total={stats.totalKelas}
+                Icon={FaSchool}
+                detailLink="/dashboard/kelas"
+                bgColor="bg-yellow-100"
               />
               <StatCard
                 title="Total Latihan"
                 total={stats.totalLatihan}
                 Icon={MdOutlineQuiz}
                 detailLink="/dashboard/latihan"
-                bgColor="bg-purple-50"
+                bgColor="bg-purple-100"
               />
             </div>
           </section>

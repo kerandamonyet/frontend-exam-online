@@ -45,7 +45,7 @@ const LineChart = ({ data }) => {
       },
       title: {
         display: true,
-        text: "Grafik Perkembangan Guru, Siswa, dan Latihan",
+        text: "Grafik Perkembangan Guru, Siswa, Kelas, dan Latihan",
         font: { size: 16 },
         color: "#333",
       },

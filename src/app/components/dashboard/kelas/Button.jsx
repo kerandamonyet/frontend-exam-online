@@ -1,21 +1,33 @@
 "use client";
 import { useState } from "react";
-import EditModal from "./EditForm";
+import CreateModal from "./CreateModal";
+import EditModal from "./EditModal";
 import { IoAddSharp, IoPencil, IoTrashOutline } from "react-icons/io5";
 import Swal from "sweetalert2";
-import { getLatihan, deleteLatihan } from "../../../../../lib/data";
+import { getkelas, deleteKelas } from "../../../../../lib/data";
 
-// export const DetailButton = () => {
-//   return (
-//     <Link href="/dashboard/latihan/detail">
-//       <button className="inline-flex items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 px-5 py-[9px] rounded-sm text-sm">
-//         <FaEye size={20} />
-//       </button>
-//     </Link>
-//   );
-// };
+export const CreateButton = ({ onSubmit }) => {
+  const [isModalOpen, setModalOpen] = useState(false);
 
-export const EditButton = ({ latihan, onUpdate }) => {
+  return (
+    <>
+      <button
+        onClick={() => setModalOpen(true)}
+        className="inline-flex items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 px-5 py-[9px] rounded-sm text-sm"
+      >
+        <IoAddSharp size={20} />
+        Create
+      </button>
+      <CreateModal
+        isOpen={isModalOpen}  
+        onClose={() => setModalOpen(false)}
+        onSubmit={onSubmit} // Callback untuk update tabel
+      />
+    </>
+  );
+};
+
+export const EditButton = ({ kelas, onUpdate }) => {
   const [isModalOpen, setModalOpen] = useState(false);
 
   const handleModalClose = () => {
@@ -47,7 +59,7 @@ export const EditButton = ({ latihan, onUpdate }) => {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         onSubmit={handleModalSubmit}
-        latihan={latihan} // Pastikan data latihan sudah tersedia
+        kelas={kelas} // Pastikan data kelas sudah tersedia
       />
     </>
   );
@@ -68,22 +80,22 @@ export const DeleteButton = ({ id, onDelete }) => {
 
     if (result.isConfirmed) {
       try {
-        const response = await deleteLatihan(id);
+        const response = await deleteKelas(id);
         if (response.status === 200) {
           // Tampilkan alert sukses sebelum memperbarui tabel
           await Swal.fire({
             icon: "success",
             title: "Berhasil!",
-            text: "Data latihan berhasil dihapus.",
+            text: "Data kelas berhasil dihapus.",
           });
           onDelete(); // Perbarui tabel setelah penghapusan
         }
       } catch (error) {
-        console.error("Terjadi kesalahan saat menghapus data latihan", error);
+        console.error("Terjadi kesalahan saat menghapus data kelas", error);
         await Swal.fire({
           icon: "error",
           title: "Gagal!",
-          text: "Terjadi kesalahan saat menghapus data latihan.",
+          text: "Terjadi kesalahan saat menghapus data kelas.",
         });
       }
     }
@@ -93,7 +105,7 @@ export const DeleteButton = ({ id, onDelete }) => {
     <button
       type="button"
       onClick={handleDelete}
-      className="inline-flex items-center space-x-1 text-white  bg-red-700 hover:bg-red-800 px-5 py-[9px] rounded-md text-sm"
+      className="inline-flex items-center space-x-1 text-white bg-red-700 hover:bg-red-800 px-5 py-[9px] rounded-md text-sm"
     >
       <IoTrashOutline size={20} />
     </button>

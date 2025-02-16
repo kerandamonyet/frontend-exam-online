@@ -1,29 +1,29 @@
 "use client";
 import { useState, useEffect } from "react";
-import { getSiswa } from "../../../../lib/data";
-import SiswaTable from "@/app/components/dashboard/siswa/SiswaTable";
-import Pagination from "@/app/components/dashboard/siswa/Paginitation";
-import Search from "@/app/components/dashboard/siswa/Search";
-import { CreateButton } from "@/app/components/dashboard/siswa/Button";
+import { getKelas } from "../../../../lib/data";
+import KelasTable from "@/app/components/dashboard/kelas/KelasTable";
+import Pagination from "@/app/components/dashboard/kelas/Paginitation";
+import Search from "@/app/components/dashboard/kelas/Search";
+import { CreateButton } from "@/app/components/dashboard/kelas/Button";
 import AuthGuard from "@/app/components/AuthGuard";
 import { BiLoaderAlt } from "react-icons/bi";
-import { TbUsers } from "react-icons/tb";
+import { FaSchool } from "react-icons/fa";
 
-function SiswaPage() {
-  const [siswa, setSiswa] = useState([]);
+function KelasPage() {
+  const [kelas, setKelas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [jumlahSiswa, setJumlahSiswa] = useState(0);
+  const [jumlahKelas, setJumlahKelas] = useState(0);
 
   const itemsPerPage = 10;
 
-  const fetchSiswa = async () => {
+  const fetchKelas = async () => {
     setLoading(true);
     try {
-      const { data, totalPages } = await getSiswa(currentPage, itemsPerPage);
-      setSiswa(data);
+      const { data, totalPages } = await getKelas(currentPage, itemsPerPage);
+      setKelas(data);
       setTotalPages(totalPages);
     } catch (error) {
       setError(error.message);
@@ -42,7 +42,7 @@ function SiswaPage() {
 
       const data = await res.json();
       if (data.success) {
-        setJumlahSiswa(data.data.total_siswa);
+        setJumlahKelas(data.data.total_kelas);
       }
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
@@ -50,7 +50,7 @@ function SiswaPage() {
   };
 
   useEffect(() => {
-    fetchSiswa();
+    fetchKelas();
     fetchStats();
   }, [currentPage]);
 
@@ -60,23 +60,23 @@ function SiswaPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-center justify-between bg-blue-50 p-4 rounded-md shadow-md border">
           <div className="flex items-center gap-3">
-            <TbUsers className="text-blue-700" size={32} />
+            <FaSchool className="text-blue-700" size={32} />
             <h1 className="text-lg font-semibold text-gray-700">
-              Daftar Siswa - Kelola Data Siswa dengan Mudah!
+              Daftar Kelas - Kelola Data Kelas dengan Mudah!
             </h1>
           </div>
           <div className="flex items-center gap-2">
             <Search />
-            <CreateButton onSubmit={fetchSiswa} />
+            <CreateButton onSubmit={fetchKelas} />
           </div>
         </div>
 
         {/* Statistik Total Siswa */}
         <div className="mt-4 bg-white p-4 rounded-md shadow border flex items-center gap-3">
-          <TbUsers size={28} className="text-orange-600" />
+          <FaSchool size={28} className="text-orange-600" />
           <div>
-            <h2 className="text-sm text-gray-600">Total Siswa</h2>
-            <p className="text-lg font-bold">{jumlahSiswa}</p>
+            <h2 className="text-sm text-gray-600">Total Kelas</h2>
+            <p className="text-lg font-bold">{jumlahKelas}</p>
           </div>
         </div>
 
@@ -96,9 +96,9 @@ function SiswaPage() {
         {/* Tabel Data Siswa */}
         {!loading && !error && (
           <div className="overflow-x-auto mt-4 bg-white p-4 rounded-md shadow border">
-            <SiswaTable
-              data={siswa}
-              setData={setSiswa}
+            <KelasTable
+              data={kelas}
+              setData={setKelas}
               currentPage={currentPage}
               itemsPerPage={itemsPerPage}
             />
@@ -120,4 +120,4 @@ function SiswaPage() {
   );
 }
 
-export default SiswaPage;
+export default KelasPage;
