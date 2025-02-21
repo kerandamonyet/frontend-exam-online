@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -18,6 +18,23 @@ function CreateModal({ isOpen, onClose, onSubmit }) {
 
   const [errors, setErrors] = useState({});
   const [pending, setPending] = useState(false);
+  const [roleList, setRoleList] = useState([]); // Inisialisasi sebagai array kosong
+
+  // mengambil data role id
+  useEffect(() => {
+    if (isOpen) {
+      axios
+        .get("http://localhost:5000/api/role")
+        .then((res) => {
+          console.log("Data dari API:", res.data); // Debugging
+          setRoleList(Array.isArray(res.data) ? res.data : res.data.data || []);
+        })
+        .catch((err) => {
+          console.error("Error fetching role:", err);
+          setRoleList([]); // Hindari crash jika error
+        });
+    }
+  }, [isOpen]);
 
   // Validasi Form
   const validate = () => {
@@ -198,20 +215,24 @@ function CreateModal({ isOpen, onClose, onSubmit }) {
             )}
           </div>
 
-          {/* Role ID */}
+          {/* Role ID (Dropdown) */}
           <div>
-            <label className="block text-sm font-medium">Role ID</label>
-            <input
-              type="number"
+            <label className="block text-sm font-medium">Role</label>
+            <select
               name="role_id"
               value={formData.role_id}
               onChange={handleChange}
-              placeholder="1"
-              required
               className={`w-full p-2 border rounded ${
                 errors.role_id ? "border-red-500" : "border-gray-300"
               }`}
-            />
+            >
+              <option value="">Pilih Role</option>
+              {roleList.map((role) => (
+                <option key={role.role_id} value={role.role_id}>
+                  {role.role_name}
+                </option>
+              ))}
+            </select>
             {errors.role_id && (
               <p className="text-red-500 text-sm mt-1">{errors.role_id}</p>
             )}

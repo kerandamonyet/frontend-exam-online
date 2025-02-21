@@ -14,22 +14,38 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
 
   // State untuk input teks/number
   const [formData, setFormData] = useState({
-    kelas: "",
+    nama_latihan: "",
+    kelas_id: "",
     tipe_latihan: "AKM", // default pilih AKM
   });
 
   const [errors, setErrors] = useState({});
   const [pending, setPending] = useState(false);
+  const [kelasList, setKelasList] = useState([]); // Inisialisasi sebagai array kosong
 
   // State untuk tanggal dan waktu menggunakan react-datepicker
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
+  useEffect(() => {
+    if (isOpen) {
+      axios
+        .get("http://localhost:5000/api/kelas")
+        .then((res) => {
+          setKelasList(
+            Array.isArray(res.data) ? res.data : res.data.data || []
+          );
+        })
+        .catch(() => setKelasList([]));
+    }
+  }, [isOpen]);
+
   // Muat data awal (jika ada) dari prop "latihan"
   useEffect(() => {
     if (latihan) {
       setFormData({
-        kelas: latihan.kelas || "",
+        nama_latihan: latihan.nama_latihan || "",
+        kelas_id: latihan.kelas_id || "",
         tipe_latihan: latihan.tipe_latihan || "AKM",
       });
       // Pastikan latihan.tgl_mulai dan latihan.tgl_selesai merupakan string tanggal yang valid
@@ -42,8 +58,11 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
   const validate = () => {
     let newErrors = {};
 
-    if (!formData.kelas.trim()) {
-      newErrors.kelas = "Kelas wajib diisi";
+    if (!formData.nama_latihan.trim()) {
+      newErrors.nama_latihan = "Kelas wajib diisi";
+    }
+    if (!formData.kelas_id.trim()) {
+      newErrors.kelas_id = "Kelas wajib diisi";
     }
     if (!formData.tipe_latihan.trim()) {
       newErrors.tipe_latihan = "Tipe Latihan wajib diisi";
@@ -95,7 +114,8 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
 
       // Panggil fungsi updatedLatihan dengan ID dari latihan.id dan data update
       await updatedLatihan(latihan.id_latihan, {
-        kelas: formData.kelas,
+        nama_latihan: formData.nama_latihan,
+        kelas_id: formData.kelas_id,
         tipe_latihan: formData.tipe_latihan,
         tgl_mulai: datetimeMulai,
         tgl_selesai: datetimeSelesai,
@@ -134,23 +154,42 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Input Kelas */}
+          {/* Nama Latihan */}
           <div>
-            <label className="block text-sm font-medium">Kelas</label>
+            <label className="block text-sm font-medium mb-2">
+              Nama Latihan
+            </label>
             <input
               type="text"
-              name="kelas"
-              value={formData.kelas}
+              name="nama_latihan"
+              value={formData.nama_latihan}
               onChange={handleChange}
-              placeholder="A"
+              placeholder="Latihan AKM 1 - Kelas A"
               required
               className={`w-full p-2 border rounded ${
-                errors.kelas ? "border-red-500" : "border-gray-300"
+                errors.nama_latihan ? "border-red-500" : "border-gray-300"
               }`}
             />
-            {errors.kelas && (
-              <p className="text-red-500 text-sm mt-1">{errors.kelas}</p>
+            {errors.nama_latihan && (
+              <p className="text-red-500 text-sm mt-1">{errors.nama_latihan}</p>
             )}
+          </div>
+          {/* Kelas ID (Dropdown) */}
+          <div>
+            <label className="block text-sm font-medium">Kelas</label>
+            <select
+              name="kelas_id"
+              value={formData.kelas_id}
+              onChange={handleChange}
+              className="w-full p-2 border rounded border-gray-300"
+            >
+              <option value="">Pilih Kelas</option>
+              {kelasList.map((kelas) => (
+                <option key={kelas.id} value={kelas.id}>
+                  {kelas.nama_kelas}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Input Tipe Latihan */}

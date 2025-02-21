@@ -6,7 +6,8 @@ import Link from "next/link";
 import BtnLogout from "../BtnLogout";
 import { TbLayoutDashboard, TbClipboardList, TbUsers } from "react-icons/tb";
 import { FaChalkboardTeacher, FaSchool } from "react-icons/fa";
-import { MdOutlineQuiz } from "react-icons/md";
+import { HiOutlinePencilAlt } from "react-icons/hi";
+
 
 import { usePathname } from "next/navigation";
 
@@ -32,6 +33,11 @@ const NavbarGuru = () => {
       name: "Latihan",
       href: "/dashboard/latihan",
       icon: <TbClipboardList size={20} />,
+    },
+    {
+      name: "Soal",
+      href: "/dashboard/soal",
+      icon: <HiOutlinePencilAlt size={20} />,
     },
     {
       name: "Kelas",

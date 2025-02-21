@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -12,23 +12,41 @@ const MySwal = withReactContent(Swal);
 function FormCreate({ onSubmit }) {
   // State untuk input teks/number (tanpa tanggal/waktu)
   const [formData, setFormData] = useState({
-    kelas: "",
+    nama_latihan: "",
+    kelas_id: "",
     tipe_latihan: "AKM", // default pilih AKM
   });
 
   const [errors, setErrors] = useState({});
   const [pending, setPending] = useState(false);
-
+  const [kelasList, setKelasList] = useState([]); // Inisialisasi sebagai array kosong
   // State untuk tanggal dan waktu menggunakan react-datepicker
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+
+  // Ambil daftar kelas dari database saat modal dibuka
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/kelas")
+      .then((res) => {
+        console.log("Data dari API:", res.data); // Debugging
+        setKelasList(Array.isArray(res.data) ? res.data : res.data.data || []);
+      })
+      .catch((err) => {
+        console.error("Error fetching kelas:", err);
+        setKelasList([]); // Hindari crash jika error
+      });
+  });
 
   // Validasi Form
   const validate = () => {
     let newErrors = {};
 
-    if (!formData.kelas.trim()) {
-      newErrors.kelas = "Kelas wajib diisi";
+    if (!formData.kelas_id.trim()) {
+      newErrors.kelas_id = "Kelas wajib diisi";
+    }
+    if (!formData.nama_latihan.trim()) {
+      newErrors.nama_latihan = "Kelas wajib diisi";
     }
     if (!formData.tipe_latihan.trim()) {
       newErrors.tipe_latihan = "Tipe Latihan wajib diisi";
@@ -81,7 +99,8 @@ function FormCreate({ onSubmit }) {
       const datetimeSelesai = formatDateTime(endDate);
 
       await axios.post("http://localhost:5000/api/latihan", {
-        kelas: formData.kelas,
+        nama_latihan: formData.nama_latihan,
+        kelas_id: formData.kelas_id,
         tipe_latihan: formData.tipe_latihan,
         tgl_mulai: datetimeMulai,
         tgl_selesai: datetimeSelesai,
@@ -97,7 +116,8 @@ function FormCreate({ onSubmit }) {
 
       // Reset form data dan datepicker ke nilai awal
       setFormData({
-        kelas: "",
+        nama_latihan: "",
+        kelas_id: "",
         tipe_latihan: "AKM",
         durasi: "",
       });
@@ -118,28 +138,51 @@ function FormCreate({ onSubmit }) {
     <div className="max-w-screen-md mx-auto p-6 card border border-md shadow-lg">
       <h3 className="text-lg font-semibold mb-4">Tambah Latihan</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Input Kelas */}
+        {/* Nama Latihan */}
         <div>
-          <label className="block text-sm font-medium">Kelas</label>
+          <label className="block text-sm font-medium mb-2">Nama Latihan</label>
           <input
             type="text"
-            name="kelas"
-            value={formData.kelas}
+            name="nama_latihan"
+            value={formData.nama_latihan}
             onChange={handleChange}
-            placeholder="A"
+            placeholder="Latihan AKM 1 - Kelas A"
             required
             className={`w-full p-2 border rounded ${
-              errors.kelas ? "border-red-500" : "border-gray-300"
+              errors.nama_latihan ? "border-red-500" : "border-gray-300"
             }`}
           />
-          {errors.kelas && (
-            <p className="text-red-500 text-sm mt-1">{errors.kelas}</p>
+          {errors.nama_latihan && (
+            <p className="text-red-500 text-sm mt-1">{errors.nama_latihan}</p>
+          )}
+        </div>
+
+        {/* Kelas ID (Dropdown) */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Kelas</label>
+          <select
+            name="kelas_id"
+            value={formData.kelas_id}
+            onChange={handleChange}
+            className={`w-full p-2 border rounded ${
+              errors.kelas_id ? "border-red-500" : "border-gray-300"
+            }`}
+          >
+            <option value="">Pilih Kelas</option>
+            {kelasList.map((kelas) => (
+              <option key={kelas.id} value={kelas.id}>
+                {kelas.nama_kelas}
+              </option>
+            ))}
+          </select>
+          {errors.kelas_id && (
+            <p className="text-red-500 text-sm mt-1">{errors.kelas_id}</p>
           )}
         </div>
 
         {/* Input Tipe Latihan */}
         <div>
-          <label className="block text-sm font-medium">Tipe Latihan</label>
+          <label className="block text-sm font-medium mb-2">Tipe Latihan</label>
           <div className="flex items-center mb-2">
             <input
               defaultChecked
@@ -197,7 +240,9 @@ function FormCreate({ onSubmit }) {
         {/* Input Tanggal Mulai dan Tanggal Selesai */}
         <div className="flex flex-1 gap-3">
           <div>
-            <label className="block text-sm font-medium">Tanggal Mulai</label>
+            <label className="block text-sm font-medium mb-2">
+              Tanggal Mulai
+            </label>
             <DatePicker
               selected={startDate}
               onChange={(date) => setStartDate(date)}
@@ -212,7 +257,9 @@ function FormCreate({ onSubmit }) {
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium">Tanggal Selesai</label>
+            <label className="block text-sm font-medium mb-2">
+              Tanggal Selesai
+            </label>
             <DatePicker
               selected={endDate}
               onChange={(date) => setEndDate(date)}
@@ -234,7 +281,8 @@ function FormCreate({ onSubmit }) {
             <button
               type="button"
               disabled={pending}
-              className='px-4 py-2 text-white bg-gray-400 rounded'>
+              className="px-4 py-2 text-white bg-gray-400 rounded"
+            >
               Kembali
             </button>
           </Link>

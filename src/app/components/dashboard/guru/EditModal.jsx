@@ -14,7 +14,6 @@ function EditModal({ isOpen, onClose, onSubmit, guru }) {
   const [formData, setFormData] = useState({
     nama_guru: guru?.nama_guru || "",
     user_password: "",
-    role_id: guru?.role_id || 1,
   });
 
   const [errors, setErrors] = useState({});
@@ -26,7 +25,6 @@ function EditModal({ isOpen, onClose, onSubmit, guru }) {
       setFormData({
         nama_guru: guru.nama_guru || "",
         user_password: "",
-        role_id: guru.role_id || 1,
       });
       setErrors({});
     }
@@ -42,21 +40,9 @@ function EditModal({ isOpen, onClose, onSubmit, guru }) {
     const newErrors = {};
     console.log("Validating formData:", formData);
 
-    if (
-      !formData.nama_guru.trim() &&
-      !formData.user_password.trim() &&
-      (!formData.role_id || formData.role_id.toString().trim() === "")
-    ) {
+    if (!formData.nama_guru.trim() && !formData.user_password.trim()) {
       newErrors.general = "Silahkan isi minimal 1 field untuk diupdate.";
       console.log("Validation error: Tidak ada field yang diisi.");
-    }
-
-    if (
-      formData.role_id &&
-      (!Number.isInteger(Number(formData.role_id)) || formData.role_id <= 0)
-    ) {
-      newErrors.role_id = "Role ID harus lebih dari 0.";
-      console.log("Validation error: Role ID tidak valid.", formData.role_id);
     }
 
     setErrors(newErrors);
@@ -207,25 +193,6 @@ function EditModal({ isOpen, onClose, onSubmit, guru }) {
             <p className="text-gray-500 text-sm mt-1">
               Biarkan kosong jika tidak ingin mengubah password
             </p>
-          </div>
-
-          {/* Field Role ID */}
-          <div>
-            <label className="block text-black text-sm font-medium mb-2">
-              Role ID
-            </label>
-            <input
-              type="number"
-              name="role_id"
-              value={formData.role_id}
-              onChange={handleChange}
-              className={`w-full p-2 border rounded text-black ${
-                errors.role_id ? "border-red-500" : "border-gray-500"
-              }`}
-            />
-            {errors.role_id && (
-              <p className="text-red-500 text-sm mt-1">{errors.role_id}</p>
-            )}
           </div>
 
           <div className="flex justify-end space-x-2">
