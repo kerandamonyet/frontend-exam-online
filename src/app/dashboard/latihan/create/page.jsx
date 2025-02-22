@@ -1,15 +1,16 @@
 "use client";
 import React from "react";
+import { useRouter } from "next/navigation";
 import FormCreate from "@/app/components/dashboard/latihan/FormCreate"; // Sesuaikan path sesuai struktur proyek Anda
 import AuthGuard from "@/app/components/AuthGuard";
 
 function CreatePage() {
+  const router = useRouter();
+
   // Callback ketika form berhasil disubmit
   const handleFormSubmit = () => {
-    // Misalnya, Anda bisa mengarahkan pengguna kembali ke halaman daftar atau menampilkan notifikasi
     console.log("Room Latihan berhasil dibuat!");
-    // Contoh: menggunakan router untuk redirect (jika menggunakan react-router-dom)
-    // navigate("/latihan");
+    router.push("/dashboard/latihan");
   };
 
   return (

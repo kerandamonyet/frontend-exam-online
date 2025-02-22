@@ -106,13 +106,13 @@ const LoginFormGuru = () => {
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <h5 className="text-xl font-medium text-gray-900">
+          <h5 className="text-xl font-bold text-gray-900">
             Login ke dashboard guru
           </h5>
           <div>
             <label
               htmlFor="email"
-              className="block mb-2 text-sm font-medium text-gray-900"
+              className="block mb-2 text-sm font-bold text-gray-900"
             >
               Email
             </label>
@@ -133,7 +133,7 @@ const LoginFormGuru = () => {
           <div>
             <label
               htmlFor="password"
-              className="block mb-2 text-sm font-medium text-gray-900"
+              className="block mb-2 text-sm font-bold text-gray-900"
             >
               Password
             </label>

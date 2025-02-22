@@ -1,16 +1,17 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { getSoalByIdSoal } from "../../../../../../../lib/data";
+import { useRouter, useParams } from "next/navigation";
 import EditForm from "@/app/components/dashboard/soal/EditForm";
+import { getSoalByIdSoal } from "../../../../../../lib/data";
 
 function EditSoalPage() {
   const router = useRouter();
+  const { id } = useParams(); // Mendapatkan id dari URL
   const [initialData, setInitialData] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Ambil data soal berdasarkan id menggunakan fungsi dari lib/data
+  // Ambil data soal berdasarkan id dari backend
   useEffect(() => {
     if (!id) {
       setError("ID soal tidak valid");
@@ -21,10 +22,9 @@ function EditSoalPage() {
     const fetchSoal = async () => {
       try {
         const result = await getSoalByIdSoal(id);
-
-        // Validasi data yang diterima dari API
-        if (result.data && result.data.length > 0) {
-          setInitialData(result.data[0]);
+        // Perbaiki validasi: jika result.data ada, anggap data valid
+        if (result.data) {
+          setInitialData(result.data);
         } else {
           setError("Soal tidak ditemukan");
         }
@@ -62,7 +62,6 @@ function EditSoalPage() {
     return (
       <div className="p-4">
         <p>Loading...</p>
-        {/* Anda bisa menambahkan spinner atau indikator loading lainnya di sini */}
       </div>
     );
   }

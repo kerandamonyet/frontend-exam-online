@@ -194,7 +194,7 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
 
           {/* Input Tipe Latihan */}
           <div>
-            <label className="block text-sm font-medium">Tipe Latihan</label>
+            <label className="block text-sm font-medium">Mata Pelajaran</label>
             <div className="flex items-center mb-2">
               <input
                 id="radio-AKM"

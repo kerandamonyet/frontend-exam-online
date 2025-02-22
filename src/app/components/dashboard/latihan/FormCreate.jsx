@@ -182,7 +182,7 @@ function FormCreate({ onSubmit }) {
 
         {/* Input Tipe Latihan */}
         <div>
-          <label className="block text-sm font-medium mb-2">Tipe Latihan</label>
+          <label className="block text-sm font-medium mb-2">Mata Pelajaran</label>
           <div className="flex items-center mb-2">
             <input
               defaultChecked

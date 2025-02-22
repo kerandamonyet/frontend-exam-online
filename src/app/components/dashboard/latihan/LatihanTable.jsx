@@ -44,7 +44,7 @@ function LatihanTable({ data, setData, currentPage, itemsPerPage }) {
           <th className="py-2 px-3">ID</th>
           <th className="py-2 px-3">Nama Latihan</th>
           <th className="py-2 px-3">Kelas</th>
-          <th className="py-2 px-3">Tipe Latihan</th>
+          <th className="py-2 px-3">Mapel</th>
           <th className="py-2 px-3">Tgl Mulai</th>
           <th className="py-2 px-3">Tgl Selesai</th>
           <th className="py-2 px-3">Durasi</th>
