@@ -1,5 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 import BtnLogout from "../components/BtnLogout";
 import AuthGuard from "../components/AuthGuard";
 import StatCard from "../components/dashboard/StatCard";
@@ -21,16 +23,27 @@ const DashboardGuru = () => {
   });
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [namaGuru, setNamaGuru] = useState(""); // State untuk menyimpan nama guru
+
+  useEffect(() => {
+    const tokenJWT = Cookies.get("auth-token");
+    if (tokenJWT) {
+      try {
+        const decoded = jwtDecode(tokenJWT);
+        setNamaGuru(decoded.namaGuru || ""); // Ambil nama_guru dari token JWT
+      } catch (err) {
+        console.error("Error decoding token:", err);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/stats/total");
-
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
         }
-
         const data = await res.json();
         if (data.success) {
           setStats({
@@ -48,11 +61,9 @@ const DashboardGuru = () => {
     const fetchChartData = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/stats/monthly");
-
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
         }
-
         const data = await res.json();
         if (data.success) {
           setChartData({
@@ -61,25 +72,25 @@ const DashboardGuru = () => {
               {
                 label: "Total Guru",
                 data: data.data.total_guru,
-                borderColor: "rgba(54, 162, 235, 1)", // Biru
+                borderColor: "rgba(54, 162, 235, 1)",
                 backgroundColor: "rgba(54, 162, 235, 0.2)",
               },
               {
                 label: "Total Siswa",
                 data: data.data.total_siswa,
-                borderColor: "rgba(75, 192, 192, 1)", // Hijau
+                borderColor: "rgba(75, 192, 192, 1)",
                 backgroundColor: "rgba(75, 192, 192, 0.2)",
               },
               {
                 label: "Total Kelas",
                 data: data.data.total_kelas,
-                borderColor: "rgba(255, 206, 86, 1)", // Kuning
+                borderColor: "rgba(255, 206, 86, 1)",
                 backgroundColor: "rgba(255, 206, 86, 0.2)",
               },
               {
                 label: "Total Latihan",
                 data: data.data.total_latihan,
-                borderColor: "rgba(255, 99, 132, 1)", // Merah
+                borderColor: "rgba(255, 99, 132, 1)",
                 backgroundColor: "rgba(255, 99, 132, 0.2)",
               },
             ],
@@ -117,10 +128,11 @@ const DashboardGuru = () => {
             <BtnLogout />
           </header>
 
-          {/* Statistik Total */}
+          {/* Tampilkan Nama Guru */}
           <section className="bg-white p-6 rounded-xl shadow-lg mb-6">
             <p className="text-gray-700 text-lg font-medium mb-4">
-              Selamat datang di Dashboard Guru!
+              Selamat datang, <span className="font-bold">{namaGuru}</span> di
+              Dashboard Guru!
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <StatCard

@@ -290,7 +290,7 @@ function FormCreate({ onSubmit }) {
 
         {/* Tombol aksi */}
         <div className="flex justify-end space-x-2">
-          <Link href="/dashboard/latihan">
+          <Link href="/dashboard/soal">
             <button
               type="button"
               disabled={pending}
