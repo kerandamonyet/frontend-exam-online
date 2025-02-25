@@ -9,7 +9,7 @@ function BiodataPage() {
   const router = useRouter();
 
   const handleSubmitSuccess = (id_latihan) => {
-    router.push(`/latihan/${id_latihan}`); // Menggunakan backtick dan interpolasi
+    router.push(`/soal/${id_latihan}`); // Menggunakan backtick dan interpolasi
   };
 
   return (
