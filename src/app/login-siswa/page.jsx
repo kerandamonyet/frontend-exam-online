@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import axios from "axios";
-import Cookies from "js-cookie"; // Import js-cookie
+import Cookies from "js-cookie";
+import Image from "next/image";
 
 const LoginFormSiswa = () => {
   const router = useRouter();
@@ -15,6 +16,7 @@ const LoginFormSiswa = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ username: "", password: "" });
   const [pending, setPending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Validasi form
   const validateForm = () => {
@@ -22,18 +24,18 @@ const LoginFormSiswa = () => {
     let newErrors = { username: "", password: "" };
 
     if (!username) {
-      newErrors.username = "Username tidak boleh kosong.";
+      newErrors.username = "Nama pengguna tidak boleh kosong.";
       valid = false;
     }
 
     if (!password) {
-      newErrors.password = "Password tidak boleh kosong.";
+      newErrors.password = "Kata sandi tidak boleh kosong.";
       valid = false;
     } else if (password.length < 8) {
-      newErrors.password = "Password harus 8 karakter.";
+      newErrors.password = "Kata sandi harus 8 karakter.";
       valid = false;
     } else if (password.length > 8) {
-      newErrors.password = "Password tidak boleh lebih dari 8 karakter.";
+      newErrors.password = "Kata sandi tidak boleh lebih dari 8 karakter.";
       valid = false;
     }
 
@@ -41,9 +43,16 @@ const LoginFormSiswa = () => {
 
     if (!valid) {
       MySwal.fire({
-        icon: "error",
-        title: "Form login Tidak Lengkap!",
-        text: "Silahkan lengkapi field yang diperlukan.",
+        icon: "warning",
+        title: "Oops!",
+        text: "Ada yang belum diisi nih, coba periksa lagi ya!",
+        confirmButtonText: "Siap!",
+        confirmButtonColor: "#4CAF50",
+        background: "#FFFDE7",
+        customClass: {
+          title: "text-yellow-600 font-bold",
+          content: "text-yellow-700",
+        },
       });
     }
 
@@ -78,8 +87,15 @@ const LoginFormSiswa = () => {
 
       MySwal.fire({
         icon: "success",
-        title: "Berhasil!",
-        text: "Login berhasil!",
+        title: "Yeay! Berhasil Masuk!",
+        text: "Selamat belajar, Sobat Pintar!",
+        confirmButtonText: "Asyik!",
+        confirmButtonColor: "#4CAF50",
+        background: "#E8F5E9",
+        customClass: {
+          title: "text-green-600 font-bold",
+          content: "text-green-700",
+        },
       });
 
       router.push("/biodata");
@@ -87,10 +103,15 @@ const LoginFormSiswa = () => {
       console.error("❌ [LOGIN] Error:", error.response?.data || error.message);
       MySwal.fire({
         icon: "error",
-        title: "Login Gagal",
-        text:
-          error.response?.data?.message ||
-          "Terjadi kesalahan, coba lagi nanti.",
+        title: "Gagal Masuk",
+        text: "Nama pengguna atau kata sandi salah. Coba ingat-ingat lagi ya!",
+        confirmButtonText: "Coba Lagi",
+        confirmButtonColor: "#EF5350",
+        background: "#FFEBEE",
+        customClass: {
+          title: "text-red-600 font-bold",
+          content: "text-red-700",
+        },
       });
     } finally {
       setPending(false);
@@ -98,78 +119,121 @@ const LoginFormSiswa = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <h5 className="text-xl font-bold text-gray-900">Selamat Datang</h5>
-          <p className="text-sm">
-            Silakan login dengan menggunakan username dan password yang anda
-            miliki
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-400 via-purple-200 to-pink-300">
+      <div className="w-full max-w-md p-6 bg-white border-4 border-yellow-400 rounded-3xl shadow-xl m-4 transform hover:scale-102 transition-transform duration-300">
+        {/* Header dengan karakter lucu */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-32 h-32 relative mb-4">
+            <div className="absolute inset-0 bg-blue-100 rounded-full flex items-center justify-center">
+              {/* Placeholder untuk karakter kartun */}
+              <div className="text-5xl">🧒</div>
+            </div>
+          </div>
+          <h1 className="text-2xl font-bold text-center text-blue-600 mb-1">
+            Halo, Sobat Pintar!
+          </h1>
+          <p className="text-md text-center text-purple-700 font-medium">
+            Yuk, masuk ke akun belajarmu!
           </p>
-          <div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="bg-blue-50 p-4 rounded-xl">
             <label
               htmlFor="username"
-              className="block mb-2 text-sm font-bold text-gray-900"
+              className="block mb-2 text-md font-bold text-blue-700"
             >
-              Username
+              Nama Pengguna
             </label>
-            <input
-              type="username"
-              name="username"
-              id="username"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              placeholder="DGV47N2B"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-            {errors.username && (
-              <p className="text-sm text-red-600">{errors.username}</p>
-            )}
-          </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="block mb-2 text-sm font-bold text-gray-900"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              placeholder="••••••••"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            {errors.password && (
-              <p className="text-sm text-red-600">{errors.password}</p>
-            )}
-          </div>
-          <div className="flex items-start">
-            <div className="flex items-center h-5">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <span className="text-xl">👤</span>
+              </div>
               <input
-                id="remember"
-                type="checkbox"
-                className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300"
+                type="text"
+                name="username"
+                id="username"
+                className="bg-white border-2 border-blue-300 text-gray-900 text-lg rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full pl-12 py-3"
+                placeholder="Masukkan nama penggunamu"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
               />
             </div>
+            {errors.username && (
+              <p className="text-sm text-red-600 mt-1">{errors.username}</p>
+            )}
+          </div>
+
+          <div className="bg-blue-50 p-4 rounded-xl">
+            <label
+              htmlFor="password"
+              className="block mb-2 text-md font-bold text-blue-700"
+            >
+              Kata Sandi
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <span className="text-xl">🔑</span>
+              </div>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                id="password"
+                placeholder="Masukkan kata sandimu"
+                className="bg-white border-2 border-blue-300 text-gray-900 text-lg rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full pl-12 pr-12 py-3"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 flex items-center pr-3"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <span className="text-xl">{showPassword ? "🙈" : "👁️"}</span>
+              </button>
+            </div>
+            {errors.password && (
+              <p className="text-sm text-red-600 mt-1">{errors.password}</p>
+            )}
+          </div>
+
+          <div className="flex items-center">
+            <input
+              id="remember"
+              type="checkbox"
+              className="w-5 h-5 border-2 border-blue-300 rounded bg-blue-50 focus:ring-3 focus:ring-blue-300"
+            />
             <label
               htmlFor="remember"
-              className="ms-2 text-sm font-medium text-gray-900"
+              className="ms-2 text-md font-medium text-purple-700"
             >
-              Ingat saya
+              Ingat aku ya!
             </label>
           </div>
+
           <button
             type="submit"
             disabled={pending}
-            className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+            className="w-full text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-xl text-lg px-5 py-4 text-center transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
-            {pending ? "Loading..." : "Login"}
+            {pending ? (
+              <span className="flex items-center justify-center">
+                <span className="animate-spin mr-2">🔄</span> Tunggu ya...
+              </span>
+            ) : (
+              <span className="flex items-center justify-center">
+                <span className="mr-2">🚀</span> Masuk Sekarang!
+              </span>
+            )}
           </button>
+
+          <div className="text-center mt-6">
+            <p className="text-sm text-gray-600">
+              Lupa kata sandi? Tanyakan ke Guru ya!
+            </p>
+          </div>
         </form>
       </div>
     </div>

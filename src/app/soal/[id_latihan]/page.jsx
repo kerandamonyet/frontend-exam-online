@@ -6,6 +6,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { FaEye } from "react-icons/fa";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 import Header from "@/app/components/soal/Header";
 import LoadingScreen from "@/app/components/soal/LoadingScreen";
@@ -17,7 +19,8 @@ import ReviewMode from "@/app/components/soal/ReviewMode";
 
 export default function SoalPage() {
   const router = useRouter();
-  const { id_latihan } = useParams();
+  const { id_latihan, id_siswa } = useParams();
+  const MySwal = withReactContent(Swal);
   const [soal, setSoal] = useState([]);
   const [formData, setFormData] = useState({ id_siswa: "", jawaban_siswa: {} });
   const [loading, setLoading] = useState(true);
@@ -166,10 +169,13 @@ export default function SoalPage() {
       console.log("Response:", response.data);
 
       setSubmitted(true);
-      alert("Semua jawaban berhasil disimpan!");
-
-      // Optional: Redirect ke halaman hasil setelah berhasil submit
-      // router.push(`/hasil/${id_latihan}`);
+      MySwal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: "Kirim jawaban berhasil!",
+      });
+      // Redirect ke halaman hasil menggunakan id_latihan dan id_siswa dari formData
+      router.push(`/hasil/${id_latihan}/${formData.id_siswa}`);
     } catch (error) {
       console.error("Error submitting answers:", error);
 

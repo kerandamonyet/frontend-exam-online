@@ -47,32 +47,38 @@ export default function QuestionContent({
       </div>
 
       <div className="space-y-3">
-        {options.map((option, i) => (
-          <div
-            key={`option-${i}`}
-            className={`rounded-xl cursor-pointer transition-all transform hover:scale-105 ${
-              currentAnswer === option
-                ? isUnsure
-                  ? "bg-gradient-to-r from-yellow-400 to-yellow-500 text-white shadow-md"
-                  : "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-md"
-                : "bg-white border-2 border-gray-200 hover:border-purple-300"
-            }`}
-            onClick={() => onAnswerChange(option)}
-          >
-            <div className="p-4 flex items-start gap-3">
-              <div
-                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                  currentAnswer === option
-                    ? "bg-white text-purple-600"
-                    : "bg-purple-100 text-purple-600"
-                }`}
-              >
-                <span className="font-bold">{String.fromCharCode(65 + i)}</span>
+        {options.map((option, i) => {
+          // Huruf yang dikirim adalah lowercase (a, b, c, d)
+          const letter = String.fromCharCode(97 + i);
+          // Untuk tampilan, gunakan huruf kapital (A, B, C, D)
+          const displayLetter = String.fromCharCode(65 + i);
+          return (
+            <div
+              key={`option-${i}`}
+              className={`rounded-xl cursor-pointer transition-all transform hover:scale-105 ${
+                currentAnswer === letter
+                  ? isUnsure
+                    ? "bg-gradient-to-r from-yellow-400 to-yellow-500 text-white shadow-md"
+                    : "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-md"
+                  : "bg-white border-2 border-gray-200 hover:border-purple-300"
+              }`}
+              onClick={() => onAnswerChange(letter)}
+            >
+              <div className="p-4 flex items-start gap-3">
+                <div
+                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                    currentAnswer === letter
+                      ? "bg-white text-purple-600"
+                      : "bg-purple-100 text-purple-600"
+                  }`}
+                >
+                  <span className="font-bold">{displayLetter}</span>
+                </div>
+                <div>{option}</div>
               </div>
-              <div>{option}</div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Navigation buttons */}
