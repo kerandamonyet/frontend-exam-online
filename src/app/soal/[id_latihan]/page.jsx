@@ -154,7 +154,7 @@ export default function SoalPage() {
 
       // Tambahkan error handling yang lebih baik
       const response = await axios.post(
-        "http://localhost:5000/api/jawaban/batch",
+        "http://localhost:5000/api/jawaban/submit",
         requestBody,
         {
           headers: {

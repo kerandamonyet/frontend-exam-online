@@ -19,27 +19,49 @@ function EditForm({ onSubmit, id, initialData }) {
   const [errors, setErrors] = useState({});
   const [pending, setPending] = useState(false);
   const [latihanList, setLatihanList] = useState([]);
-  const [options, setOptions] = useState(["", ""]);
-  const [correctAnswer, setCorrectAnswer] = useState("");
+  // Inisialisasi 4 opsi
+  const [options, setOptions] = useState(["", "", "", ""]);
+  // Gunakan index untuk jawaban benar (0 untuk 'a', 1 untuk 'b', dst.)
+  const [correctAnswerIndex, setCorrectAnswerIndex] = useState(null);
   const { quill, quillRef } = useQuill();
 
-  // Set initial data dan update Quill
+  // Set initial data dan konversi jawaban benar ke indeks
   useEffect(() => {
+    console.log("Initial Data:", initialData);
     if (initialData) {
       setFormData({
         latihan_id: initialData.latihan_id || "",
         text_soal: initialData.text_soal || "",
         tipe_soal: initialData.tipe_soal || "pilihan_ganda",
       });
-      setOptions(
-        initialData.options && initialData.options.length > 0
-          ? initialData.options
-          : ["", ""]
-      );
-      setCorrectAnswer(initialData.jawaban_benar || "");
+      setOptions([
+        initialData.opsi_a || "",
+        initialData.opsi_b || "",
+        initialData.opsi_c || "",
+        initialData.opsi_d || "",
+      ]);
+      if (initialData.jawaban_benar) {
+        const letter = initialData.jawaban_benar.toLowerCase();
+        const index = letter.charCodeAt(0) - 97; // 'a' => 0, 'b' => 1, etc.
+        setCorrectAnswerIndex(index);
+      } else {
+        setCorrectAnswerIndex(null);
+      }
       if (quill && initialData.text_soal) {
         quill.clipboard.dangerouslyPasteHTML(initialData.text_soal);
       }
+      console.log("Form data di-set:", {
+        latihan_id: initialData.latihan_id || "",
+        text_soal: initialData.text_soal || "",
+        tipe_soal: initialData.tipe_soal || "pilihan_ganda",
+      });
+      console.log("Options di-set:", [
+        initialData.opsi_a || "",
+        initialData.opsi_b || "",
+        initialData.opsi_c || "",
+        initialData.opsi_d || "",
+      ]);
+      console.log("Correct Answer Index di-set:", correctAnswerIndex);
     }
   }, [initialData, quill]);
 
@@ -47,9 +69,11 @@ function EditForm({ onSubmit, id, initialData }) {
   useEffect(() => {
     if (quill) {
       const handleTextChange = () => {
+        const newText = quill.root.innerHTML;
+        console.log("Text soalnya berubah:", newText);
         setFormData((prev) => ({
           ...prev,
-          text_soal: quill.root.innerHTML,
+          text_soal: newText,
         }));
       };
       quill.on("text-change", handleTextChange);
@@ -63,6 +87,7 @@ function EditForm({ onSubmit, id, initialData }) {
       .get("http://localhost:5000/api/latihan")
       .then((res) => {
         const data = Array.isArray(res.data) ? res.data : res.data.data || [];
+        console.log("Data latihan:", data);
         setLatihanList(data);
       })
       .catch((err) => {
@@ -83,15 +108,21 @@ function EditForm({ onSubmit, id, initialData }) {
     if (options.some((opt) => !opt.trim())) {
       newErrors.options = "Semua opsi harus diisi";
     }
-    if (!correctAnswer.trim()) {
+    if (
+      correctAnswerIndex === null ||
+      correctAnswerIndex < 0 ||
+      correctAnswerIndex > 3
+    ) {
       newErrors.correctAnswer = "Jawaban benar wajib dipilih";
     }
     setErrors(newErrors);
+    console.log("Errors:", newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(`Handle change - ${name}:`, value);
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
@@ -99,27 +130,8 @@ function EditForm({ onSubmit, id, initialData }) {
   const handleOptionChange = (index, value) => {
     const newOptions = [...options];
     newOptions[index] = value;
+    console.log(`Option ${index} diubah menjadi:`, value);
     setOptions(newOptions);
-    // Jika opsi yang diubah adalah jawaban yang benar, perbarui state correctAnswer
-    if (correctAnswer === options[index]) {
-      setCorrectAnswer(value);
-    }
-    setErrors((prev) => ({ ...prev, options: "" }));
-  };
-
-  const addOption = () => {
-    setOptions([...options, ""]);
-  };
-
-  const removeOption = (index) => {
-    if (options.length > 2) {
-      const removedOption = options[index];
-      const newOptions = options.filter((_, i) => i !== index);
-      setOptions(newOptions);
-      if (correctAnswer === removedOption) {
-        setCorrectAnswer("");
-      }
-    }
   };
 
   // Submit form dengan update parsial
@@ -139,21 +151,37 @@ function EditForm({ onSubmit, id, initialData }) {
       if (formData.tipe_soal !== initialData.tipe_soal) {
         changedData.tipe_soal = formData.tipe_soal;
       }
-      if (JSON.stringify(options) !== JSON.stringify(initialData.options)) {
-        changedData.options = options;
+      if (options[0] !== initialData.opsi_a) {
+        changedData.opsi_a = options[0];
       }
-      if (correctAnswer !== initialData.jawaban_benar) {
-        changedData.jawaban_benar = correctAnswer;
+      if (options[1] !== initialData.opsi_b) {
+        changedData.opsi_b = options[1];
+      }
+      if (options[2] !== initialData.opsi_c) {
+        changedData.opsi_c = options[2];
+      }
+      if (options[3] !== initialData.opsi_d) {
+        changedData.opsi_d = options[3];
+      }
+      // Konversi indeks ke huruf ('a', 'b', 'c', 'd')
+      const newJawabanBenar = String.fromCharCode(97 + correctAnswerIndex);
+      if (newJawabanBenar !== initialData.jawaban_benar) {
+        changedData.jawaban_benar = newJawabanBenar;
       }
     } else {
       Object.assign(changedData, {
         latihan_id: formData.latihan_id,
         text_soal: formData.text_soal,
         tipe_soal: formData.tipe_soal,
-        options: options,
-        jawaban_benar: correctAnswer,
+        opsi_a: options[0],
+        opsi_b: options[1],
+        opsi_c: options[2],
+        opsi_d: options[3],
+        jawaban_benar: String.fromCharCode(97 + correctAnswerIndex),
       });
     }
+
+    console.log("Changed Data yang akan dikirim:", changedData);
 
     if (Object.keys(changedData).length === 0) {
       MySwal.fire({
@@ -167,6 +195,7 @@ function EditForm({ onSubmit, id, initialData }) {
 
     try {
       await updatedSoal(id, changedData);
+      console.log("Update berhasil untuk soal dengan ID:", id);
       MySwal.fire({
         icon: "success",
         title: "Berhasil!",
@@ -174,6 +203,7 @@ function EditForm({ onSubmit, id, initialData }) {
       });
       onSubmit();
     } catch (error) {
+      console.error("Error updating soal:", error);
       MySwal.fire({
         icon: "error",
         title: "Gagal!",
@@ -235,19 +265,19 @@ function EditForm({ onSubmit, id, initialData }) {
           </div>
           <div className="flex items-center mb-2">
             <input
-              id="radio-drag-drop"
+              id="radio-tarik-garis"
               type="radio"
-              value="drag_drop"
+              value="tarik_garis"
               name="tipe_soal"
-              checked={formData.tipe_soal === "drag_drop"}
+              checked={formData.tipe_soal === "tarik_garis"}
               onChange={handleChange}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
             />
             <label
-              htmlFor="radio-drag-drop"
+              htmlFor="radio-tarik-garis"
               className="ml-2 text-sm font-medium text-gray-900"
             >
-              Drag and Drop
+              Tarik Garis
             </label>
           </div>
           {errors.tipe_soal && (
@@ -276,16 +306,19 @@ function EditForm({ onSubmit, id, initialData }) {
           </label>
           {options.map((option, index) => (
             <div
-              key={index}
+              key={`option-${index}`}
               className="flex items-center gap-2 mb-2 p-2 border rounded hover:bg-gray-50"
             >
               <label className="flex items-center gap-2 w-full">
                 <input
                   type="radio"
                   name="correctAnswer"
-                  value={option}
-                  checked={correctAnswer === option}
-                  onChange={() => setCorrectAnswer(option)}
+                  value={index}
+                  checked={correctAnswerIndex === index}
+                  onChange={() => {
+                    console.log("Radio option dipilih index:", index);
+                    setCorrectAnswerIndex(index);
+                  }}
                   className="h-6 w-6 accent-blue-600 focus:ring-2 focus:ring-black"
                 />
                 <span className="text-sm font-medium">
@@ -300,14 +333,6 @@ function EditForm({ onSubmit, id, initialData }) {
                   className="border p-2 flex-1"
                 />
               </label>
-              <button
-                type="button"
-                onClick={() => removeOption(index)}
-                disabled={options.length <= 2}
-                className="text-red-500"
-              >
-                ❌
-              </button>
             </div>
           ))}
           {errors.options && (
@@ -316,13 +341,6 @@ function EditForm({ onSubmit, id, initialData }) {
           {errors.correctAnswer && (
             <p className="text-red-500 text-sm mt-1">{errors.correctAnswer}</p>
           )}
-          <button
-            type="button"
-            onClick={addOption}
-            className="mt-2 inline-block text-blue-600"
-          >
-            ➕ Tambah Opsi
-          </button>
         </div>
 
         {/* Tombol Aksi */}

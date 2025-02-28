@@ -10,6 +10,7 @@ function SoalCard({ data = [], setData, currentPage, itemsPerPage }) {
   const fetchLatihan = useCallback(async () => {
     try {
       const { data: latihanData } = await getLatihan();
+      // Asumsikan data latihan memiliki properti "id" dan "nama_latihan"
       setLatihanList(latihanData || []);
     } catch (error) {
       console.error("Gagal mengambil data latihan:", error);
@@ -43,12 +44,15 @@ function SoalCard({ data = [], setData, currentPage, itemsPerPage }) {
     <div className="space-y-4">
       {loading ? (
         <div className="text-center py-4">Memuat data...</div>
-      ) : data?.length > 0 ? ( // Menggunakan optional chaining
+      ) : data?.length > 0 ? (
         data.map((soal) => {
+          // Sesuaikan pencocokan latihan, asumsikan latihan.id ada dan cocok dengan soal.latihan_id
           const namaLatihan =
-            latihanList.find(
-              (latihan) => latihan.id_latihan === soal.latihan_id
-            )?.nama_latihan || "Tidak Diketahui";
+            latihanList.find((latihan) => latihan.id_latihan === soal.latihan_id)
+              ?.nama_latihan || "Tidak Diketahui";
+
+          // Buat array options dari field opsi_a sampai opsi_d
+          const options = [soal.opsi_a, soal.opsi_b, soal.opsi_c, soal.opsi_d];
 
           return (
             <div
@@ -68,18 +72,14 @@ function SoalCard({ data = [], setData, currentPage, itemsPerPage }) {
                 </div>
                 <div className="mb-2">
                   <strong>Options: </strong>
-                  {Array.isArray(soal.options) ? (
-                    <ul className="list-disc pl-4">
-                      {soal.options.map((option, index) => (
-                        <li key={index}>
-                          <strong>{String.fromCharCode(65 + index)}. </strong>
-                          <span dangerouslySetInnerHTML={{ __html: option }} />
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <span dangerouslySetInnerHTML={{ __html: soal.options }} />
-                  )}
+                  <ul className="list-disc pl-4">
+                    {options.map((option, index) => (
+                      <li key={index}>
+                        <strong>{String.fromCharCode(65 + index)}. </strong>
+                        <span dangerouslySetInnerHTML={{ __html: option }} />
+                      </li>
+                    ))}
+                  </ul>
                 </div>
                 <div className="mb-2">
                   <strong>Jawaban Benar: </strong>

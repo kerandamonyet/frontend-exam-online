@@ -1,4 +1,3 @@
-// components/QuestionContent.jsx
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -20,6 +19,14 @@ export default function QuestionContent({
   isFirstQuestion,
   isLastQuestion,
 }) {
+  // Ambil opsi dari properti individual pada currentSoal
+  const options = [
+    currentSoal.opsi_a,
+    currentSoal.opsi_b,
+    currentSoal.opsi_c,
+    currentSoal.opsi_d,
+  ];
+
   return (
     <>
       <div
@@ -40,10 +47,10 @@ export default function QuestionContent({
       </div>
 
       <div className="space-y-3">
-        {Object.values(currentSoal.options || {}).map((option, i) => (
+        {options.map((option, i) => (
           <div
-            key={i}
-            className={`rounded-xl cursor-pointer transition-all transform hover:scale-102 ${
+            key={`option-${i}`}
+            className={`rounded-xl cursor-pointer transition-all transform hover:scale-105 ${
               currentAnswer === option
                 ? isUnsure
                   ? "bg-gradient-to-r from-yellow-400 to-yellow-500 text-white shadow-md"
