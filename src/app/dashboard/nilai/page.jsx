@@ -1,9 +1,16 @@
 "use client";
 import { useState, useEffect } from "react";
-import { getAllHasilSiswa, getAllSesiLatihan, getLatihan, getSiswa } from "../../../../lib/data";
+import {
+  getAllHasilSiswa,
+  getHasilByLatihan,
+  getAllSesiLatihan,
+  getLatihan,
+  getSiswa,
+} from "../../../../lib/data";
 import NilaiTable from "@/app/components/dashboard/nilai/NilaiTable";
 import Pagination from "@/app/components/dashboard/nilai/Paginitation";
 import Search from "@/app/components/dashboard/nilai/Search";
+import SortirByLatihan from "@/app/components/dashboard/nilai/SortirByLatihan";
 import AuthGuard from "@/app/components/AuthGuard";
 import { IoAddSharp } from "react-icons/io5";
 import { TbClipboardList, TbUsers } from "react-icons/tb";
@@ -19,16 +26,29 @@ function NilaiPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [jumlahSiswa, setJumlahSiswa] = useState(0);
   const [jumlahLatihan, setJumlahLatihan] = useState(0);
+  const [filterLatihan, setFilterLatihan] = useState(null);
   const itemsPerPage = 5;
 
   const fetchNilai = async () => {
     setLoading(true);
     try {
-      const { data, totalPages } = await getAllHasilSiswa(currentPage, itemsPerPage);
+      let response;
+      if (filterLatihan) {
+        response = await getHasilByLatihan(
+          filterLatihan,
+          currentPage,
+          itemsPerPage
+        );
+      } else {
+        response = await getAllHasilSiswa(currentPage, itemsPerPage);
+      }
+      const { data, totalPages } = response;
       setNilai(data);
       setTotalPages(totalPages);
+      setError(null);
     } catch (error) {
       setError(error.message);
+      setNilai([]);
     } finally {
       setLoading(false);
     }
@@ -55,7 +75,12 @@ function NilaiPage() {
   useEffect(() => {
     fetchNilai();
     fetchStats();
-  }, [currentPage]);
+  }, [currentPage, filterLatihan]);
+
+  const handleFilterSoalByLatihan = async (id_latihan) => {
+    setFilterLatihan(id_latihan);
+    setCurrentPage(1);
+  };
 
   return (
     <AuthGuard>
@@ -65,7 +90,7 @@ function NilaiPage() {
           <div className="flex items-center gap-3">
             <TbUsers className="text-blue-700" size={32} />
             <h1 className="text-lg font-semibold text-gray-700">
-              Daftar Sesi Latihan - Kelola Data Sesi Latihan dengan Mudah!
+              Daftar Nilai Siswa - Kelola Data Nilai Siswa dengan Mudah!
             </h1>
           </div>
           <div className="flex items-center gap-2">
@@ -75,7 +100,7 @@ function NilaiPage() {
                 <IoAddSharp size={20} />
                 <span>Create</span>
               </button>
-            </Link>{" "}
+            </Link>
           </div>
         </div>
 

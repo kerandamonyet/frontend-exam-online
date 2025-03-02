@@ -21,12 +21,13 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
 
   const [errors, setErrors] = useState({});
   const [pending, setPending] = useState(false);
-  const [kelasList, setKelasList] = useState([]); // Inisialisasi sebagai array kosong
+  const [kelasList, setKelasList] = useState([]);
 
   // State untuk tanggal dan waktu menggunakan react-datepicker
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
+  // Mengambil data kelas ketika modal terbuka
   useEffect(() => {
     if (isOpen) {
       axios
@@ -40,7 +41,7 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
     }
   }, [isOpen]);
 
-  // Muat data awal (jika ada) dari prop "latihan"
+  // Muat data awal latihan jika tersedia
   useEffect(() => {
     if (latihan) {
       setFormData({
@@ -48,9 +49,12 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
         kelas_id: latihan.kelas_id || "",
         tipe_latihan: latihan.tipe_latihan || "AKM",
       });
-      // Pastikan latihan.tgl_mulai dan latihan.tgl_selesai merupakan string tanggal yang valid
-      setStartDate(new Date(latihan.tgl_mulai));
-      setEndDate(new Date(latihan.tgl_selesai));
+      setStartDate(
+        latihan.tgl_mulai ? new Date(latihan.tgl_mulai) : new Date()
+      );
+      setEndDate(
+        latihan.tgl_selesai ? new Date(latihan.tgl_selesai) : new Date()
+      );
     }
   }, [latihan]);
 
@@ -59,7 +63,7 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
     let newErrors = {};
 
     if (!formData.nama_latihan.trim()) {
-      newErrors.nama_latihan = "Kelas wajib diisi";
+      newErrors.nama_latihan = "Nama latihan wajib diisi";
     }
     if (!formData.kelas_id.trim()) {
       newErrors.kelas_id = "Kelas wajib diisi";
@@ -112,7 +116,7 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
       const datetimeMulai = formatDateTime(startDate);
       const datetimeSelesai = formatDateTime(endDate);
 
-      // Panggil fungsi updatedLatihan dengan ID dari latihan.id dan data update
+      // Panggil fungsi updatedLatihan dengan ID latihan dan data update
       await updatedLatihan(latihan.id_latihan, {
         nama_latihan: formData.nama_latihan,
         kelas_id: formData.kelas_id,
@@ -128,7 +132,7 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
         text: "Latihan berhasil diperbarui!",
       });
 
-      // Tutup modal setelah sukses (opsional)
+      // Tutup modal setelah sukses
       onClose();
     } catch (error) {
       MySwal.fire({
@@ -142,7 +146,7 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
       <div className="bg-white p-6 rounded-lg w-96">
         <div className="flex justify-between items-center border-b pb-3">
           <h3 className="text-lg font-semibold">Edit Latihan</h3>
@@ -165,7 +169,6 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
               value={formData.nama_latihan}
               onChange={handleChange}
               placeholder="Latihan AKM 1 - Kelas A"
-              required
               className={`w-full p-2 border rounded ${
                 errors.nama_latihan ? "border-red-500" : "border-gray-300"
               }`}
@@ -174,14 +177,17 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
               <p className="text-red-500 text-sm mt-1">{errors.nama_latihan}</p>
             )}
           </div>
-          {/* Kelas ID (Dropdown) */}
+
+          {/* Dropdown Kelas */}
           <div>
             <label className="block text-sm font-medium">Kelas</label>
             <select
               name="kelas_id"
               value={formData.kelas_id}
               onChange={handleChange}
-              className="w-full p-2 border rounded border-gray-300"
+              className={`w-full p-2 border rounded ${
+                errors.kelas_id ? "border-red-500" : "border-gray-300"
+              }`}
             >
               <option value="">Pilih Kelas</option>
               {kelasList.map((kelas) => (
@@ -190,9 +196,12 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
                 </option>
               ))}
             </select>
+            {errors.kelas_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.kelas_id}</p>
+            )}
           </div>
 
-          {/* Input Tipe Latihan */}
+          {/* Tipe Latihan */}
           <div>
             <label className="block text-sm font-medium">Mata Pelajaran</label>
             <div className="flex items-center mb-2">
@@ -251,9 +260,9 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
             )}
           </div>
 
-          {/* Input Tanggal Mulai dan Tanggal Selesai */}
-          <div className="flex flex-1 gap-3">
-            <div>
+          {/* Tanggal Mulai dan Tanggal Selesai */}
+          <div className="flex flex-col md:flex-row gap-3">
+            <div className="flex-1">
               <label className="block text-sm font-medium">Tanggal Mulai</label>
               <DatePicker
                 selected={startDate}
@@ -262,13 +271,15 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
                 timeFormat="HH:mm"
                 timeIntervals={15}
                 dateFormat="dd-MM-yyyy HH:mm:ss"
-                className="w-full p-2 border rounded"
+                className={`w-full p-2 border rounded ${
+                  errors.tgl_mulai ? "border-red-500" : "border-gray-300"
+                }`}
               />
               {errors.tgl_mulai && (
                 <p className="text-red-500 text-sm mt-1">{errors.tgl_mulai}</p>
               )}
             </div>
-            <div>
+            <div className="flex-1">
               <label className="block text-sm font-medium">
                 Tanggal Selesai
               </label>
@@ -279,7 +290,9 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
                 timeFormat="HH:mm"
                 timeIntervals={15}
                 dateFormat="dd-MM-yyyy HH:mm:ss"
-                className="w-full p-2 border rounded"
+                className={`w-full p-2 border rounded ${
+                  errors.tgl_selesai ? "border-red-500" : "border-gray-300"
+                }`}
               />
               {errors.tgl_selesai && (
                 <p className="text-red-500 text-sm mt-1">
@@ -289,8 +302,16 @@ function EditModal({ isOpen, onClose, onSubmit, latihan }) {
             </div>
           </div>
 
-          {/* Tombol Submit */}
+          {/* Tombol Submit dan Batal */}
           <div className="flex justify-end space-x-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded bg-gray-500 text-white hover:bg-gray-600"
+              disabled={pending}
+            >
+              Batal
+            </button>
             <button
               type="submit"
               disabled={pending}
