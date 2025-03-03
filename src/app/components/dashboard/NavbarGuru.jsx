@@ -41,7 +41,7 @@ const NavbarGuru = () => {
       ],
     },
     {
-      title: "Manajemen Ujian",
+      title: "Manajemen Latihan",
       items: [
         {
           name: "Latihan",
@@ -54,14 +54,9 @@ const NavbarGuru = () => {
           icon: <HiOutlinePencilAlt size={20} />,
         },
         {
-          name: "Latihan Soal",
-          href: "/dashboard/latihan-soal",
-          icon: <TbBook size={20} />,
-        },
-        {
           name: "Sesi Latihan",
           href: "/dashboard/sesi-latihan",
-          icon: <TbClipboardCheck size={20} />,
+          icon: <TbBook size={20} />,
         },
       ],
     },

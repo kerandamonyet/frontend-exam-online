@@ -22,6 +22,11 @@ function FormCreate({ onSubmit }) {
   const [options, setOptions] = useState(["", "", "", ""]);
   const [correctAnswer, setCorrectAnswer] = useState("");
 
+  // Tarik garis (line matching) specific state
+  const [leftOptions, setLeftOptions] = useState(["", ""]);
+  const [rightOptions, setRightOptions] = useState(["", ""]);
+  const [matchingPairs, setMatchingPairs] = useState({});
+
   // Drag and drop specific state (if needed in the future)
   const [dragDropItems, setDragDropItems] = useState([]);
 
@@ -103,10 +108,23 @@ function FormCreate({ onSubmit }) {
       if (!correctAnswer) {
         newErrors.correctAnswer = "Jawaban benar wajib dipilih";
       }
-    } else if (formData.tipe_soal === "drag_drop") {
-      if (dragDropItems.length === 0) {
-        newErrors.dragDropItems =
-          "Minimal satu item drag & drop harus ditambahkan";
+    } else if (formData.tipe_soal === "tarik_garis") {
+      if (leftOptions.some((opt) => !opt.trim())) {
+        newErrors.leftOptions = "Semua opsi kiri harus diisi";
+      }
+
+      if (rightOptions.some((opt) => !opt.trim())) {
+        newErrors.rightOptions = "Semua opsi kanan harus diisi";
+      }
+
+      // Check if all left options have a matching right option
+      const allLeftOptionsMatched = leftOptions.every(
+        (opt) => opt.trim() && matchingPairs[opt]
+      );
+
+      if (!allLeftOptionsMatched) {
+        newErrors.matchingPairs =
+          "Semua opsi kiri harus dipasangkan dengan opsi kanan";
       }
     }
 
@@ -133,6 +151,91 @@ function FormCreate({ onSubmit }) {
   const handleCorrectAnswerChange = (value) => {
     setCorrectAnswer(value);
     setErrors((prev) => ({ ...prev, correctAnswer: "" }));
+  };
+
+  // Handle left option changes for tarik garis
+  const handleLeftOptionChange = (index, value) => {
+    const newLeftOptions = [...leftOptions];
+    const oldValue = newLeftOptions[index];
+    newLeftOptions[index] = value;
+    setLeftOptions(newLeftOptions);
+
+    // Update the matchingPairs object if this left option had a match
+    if (oldValue && matchingPairs[oldValue]) {
+      const newPairs = { ...matchingPairs };
+      delete newPairs[oldValue];
+      if (value) {
+        newPairs[value] = matchingPairs[oldValue];
+      }
+      setMatchingPairs(newPairs);
+    }
+
+    setErrors((prev) => ({ ...prev, leftOptions: "" }));
+  };
+
+  // Handle right option changes for tarik garis
+  const handleRightOptionChange = (index, value) => {
+    const newRightOptions = [...rightOptions];
+    const oldValue = newRightOptions[index];
+    newRightOptions[index] = value;
+    setRightOptions(newRightOptions);
+
+    // Update matches referencing this right option
+    if (oldValue) {
+      const newPairs = { ...matchingPairs };
+      for (const [left, right] of Object.entries(newPairs)) {
+        if (right === oldValue && value) {
+          newPairs[left] = value;
+        }
+      }
+      setMatchingPairs(newPairs);
+    }
+
+    setErrors((prev) => ({ ...prev, rightOptions: "" }));
+  };
+
+  // Handle match pair selection for tarik garis
+  const handleMatchPairChange = (leftOption, rightOption) => {
+    setMatchingPairs((prev) => ({
+      ...prev,
+      [leftOption]: rightOption,
+    }));
+    setErrors((prev) => ({ ...prev, matchingPairs: "" }));
+  };
+
+  // Add new row to tarik garis options
+  const addTarikGarisRow = () => {
+    setLeftOptions((prev) => [...prev, ""]);
+    setRightOptions((prev) => [...prev, ""]);
+  };
+
+  // Remove row from tarik garis options
+  const removeTarikGarisRow = (index) => {
+    if (leftOptions.length <= 2) {
+      MySwal.fire({
+        icon: "warning",
+        title: "Tidak dapat menghapus",
+        text: "Minimal harus ada 2 pasangan untuk soal tarik garis",
+      });
+      return;
+    }
+
+    const newLeftOptions = [...leftOptions];
+    const newRightOptions = [...rightOptions];
+
+    // Remove the leftOption from matchingPairs if it exists
+    const removedLeftOption = newLeftOptions[index];
+    const newPairs = { ...matchingPairs };
+    if (removedLeftOption) {
+      delete newPairs[removedLeftOption];
+    }
+
+    newLeftOptions.splice(index, 1);
+    newRightOptions.splice(index, 1);
+
+    setLeftOptions(newLeftOptions);
+    setRightOptions(newRightOptions);
+    setMatchingPairs(newPairs);
   };
 
   // Handle form submission
@@ -162,6 +265,29 @@ function FormCreate({ onSubmit }) {
           text_soal: formData.text_soal,
           tipe_soal: formData.tipe_soal,
           items: dragDropItems,
+        };
+      } else if (formData.tipe_soal === "tarik_garis") {
+        // Filter out empty options
+        const filteredLeftOptions = leftOptions.filter((opt) => opt.trim());
+        const filteredRightOptions = rightOptions.filter((opt) => opt.trim());
+
+        // Create jawaban_benar object from matchingPairs
+        const jawaban_benar = {};
+        filteredLeftOptions.forEach((leftOpt) => {
+          if (matchingPairs[leftOpt]) {
+            jawaban_benar[leftOpt] = matchingPairs[leftOpt];
+          }
+        });
+
+        requestBody = {
+          latihan_id: formData.latihan_id,
+          text_soal: formData.text_soal,
+          tipe_soal: formData.tipe_soal,
+          data_tarik_garis: {
+            opsi_kiri: filteredLeftOptions,
+            opsi_kanan: filteredRightOptions,
+            jawaban_benar: jawaban_benar,
+          },
         };
       }
 
@@ -207,6 +333,9 @@ function FormCreate({ onSubmit }) {
     setOptions(["", "", "", ""]);
     setCorrectAnswer("");
     setDragDropItems([]);
+    setLeftOptions(["", ""]);
+    setRightOptions(["", ""]);
+    setMatchingPairs({});
     if (quill) {
       quill.setContents([]);
     }
@@ -247,7 +376,7 @@ function FormCreate({ onSubmit }) {
           <label className="block text-sm font-semibold mb-3 text-gray-700">
             Tipe Soal
           </label>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div
               className={`flex items-center p-3 border rounded-md ${
                 formData.tipe_soal === "pilihan_ganda"
@@ -269,6 +398,29 @@ function FormCreate({ onSubmit }) {
                 className="ml-2 text-sm font-medium text-gray-900 w-full cursor-pointer"
               >
                 Pilihan Ganda
+              </label>
+            </div>
+            <div
+              className={`flex items-center p-3 border rounded-md ${
+                formData.tipe_soal === "tarik_garis"
+                  ? "border-blue-500 bg-blue-50"
+                  : "border-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              <input
+                id="radio-tarik-garis"
+                type="radio"
+                value="tarik_garis"
+                name="tipe_soal"
+                checked={formData.tipe_soal === "tarik_garis"}
+                onChange={handleChange}
+                className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="radio-tarik-garis"
+                className="ml-2 text-sm font-medium text-gray-900 w-full cursor-pointer"
+              >
+                Tarik Garis
               </label>
             </div>
             <div
@@ -359,18 +511,107 @@ function FormCreate({ onSubmit }) {
             </div>
           </div>
         )}
-        {/* Drag and Drop Interface - Placeholder */}
-        {formData.tipe_soal === "drag_drop" && (
-          <div className="form-group bg-gray-50 p-4 rounded-md border border-gray-300">
-            <div className="text-center p-5">
-              <p className="text-gray-500">
-                Fitur Drag and Drop belum tersedia saat ini.
-                <br />
-                Silakan gunakan tipe Pilihan Ganda.
-              </p>
-              {errors.dragDropItems && (
+        {/* Tarik Garis Interface */}
+        {formData.tipe_soal === "tarik_garis" && (
+          <div className="form-group">
+            <div className="flex justify-between items-center mb-3">
+              <label className="block text-sm font-semibold text-gray-700">
+                Pasangan Tarik Garis <span className="text-red-500">*</span>
+              </label>
+              <button
+                type="button"
+                onClick={addTarikGarisRow}
+                className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"
+              >
+                + Tambah Pasangan
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="grid grid-cols-5 gap-2 px-2 pb-2 font-medium text-sm">
+                <div className="col-span-2">Opsi Kiri</div>
+                <div className="col-span-2">Opsi Kanan</div>
+                <div></div>
+              </div>
+
+              {leftOptions.map((leftOption, index) => (
+                <div key={index} className="grid grid-cols-5 gap-2">
+                  <input
+                    type="text"
+                    value={leftOption}
+                    onChange={(e) =>
+                      handleLeftOptionChange(index, e.target.value)
+                    }
+                    placeholder="Isi opsi kiri"
+                    className="col-span-2 border p-2 rounded-md focus:ring focus:ring-blue-200 focus:outline-none"
+                  />
+
+                  <select
+                    value={matchingPairs[leftOption] || ""}
+                    onChange={(e) =>
+                      handleMatchPairChange(leftOption, e.target.value)
+                    }
+                    className="col-span-2 border p-2 rounded-md focus:ring focus:ring-blue-200 focus:outline-none"
+                    disabled={!leftOption}
+                  >
+                    <option value="">Pilih Pasangan</option>
+                    {rightOptions.map(
+                      (rightOption, idx) =>
+                        rightOption && (
+                          <option key={idx} value={rightOption}>
+                            {rightOption}
+                          </option>
+                        )
+                    )}
+                  </select>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={rightOptions[index]}
+                      onChange={(e) =>
+                        handleRightOptionChange(index, e.target.value)
+                      }
+                      placeholder="Isi opsi kanan"
+                      className="border p-2 rounded-md w-full focus:ring focus:ring-blue-200 focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeTarikGarisRow(index)}
+                      className="p-2 text-red-500 hover:bg-red-50 rounded-md"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {errors.leftOptions && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.dragDropItems}
+                  {errors.leftOptions}
+                </p>
+              )}
+              {errors.rightOptions && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.rightOptions}
+                </p>
+              )}
+              {errors.matchingPairs && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.matchingPairs}
                 </p>
               )}
             </div>

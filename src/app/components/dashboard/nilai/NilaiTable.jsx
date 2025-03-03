@@ -52,10 +52,10 @@ function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
           <th className="py-2 px-3">ID</th>
           <th className="py-2 px-3">Nama Siswa</th>
           <th className="py-2 px-3">Nama Latihan</th>
-          <th className="py-2 px-3">Total Soal</th>
-          <th className="py-2 px-3">Benar</th>
-          <th className="py-2 px-3">Salah</th>
-          <th className="py-2 px-3">Skor</th>
+          <th className="py-2 px-3 text-center">Total Soal</th>
+          <th className="py-2 px-3 text-center">Benar</th>
+          <th className="py-2 px-3 text-center">Salah</th>
+          <th className="py-2 px-3 text-center">Skor</th>
           <th className="py-2 px-3">Created At</th>
           {/* <th className="py-2 px-3 text-center">Action</th> */}
         </tr>
@@ -78,13 +78,13 @@ function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
                 className="border-b even:bg-white odd:bg-gray-100"
               >
                 <td className="py-2 px-3 text-center">{rowNumber}</td>
-                <td className="py-2 px-3 text-center">{nilai.id}</td>
-                <td className="py-2 px-3 text-center">{namaSiswa}</td>
-                <td className="py-2 px-3 text-center">{namaLatihan}</td>
+                <td className="py-2 px-3">{nilai.id}</td>
+                <td className="py-2 px-3">{namaSiswa}</td>
+                <td className="py-2 px-3">{namaLatihan}</td>
                 <td className="py-2 px-3 text-center">{nilai.total_soal}</td>
                 <td className="py-2 px-3 text-center">{nilai.benar}</td>
                 <td className="py-2 px-3 text-center">{nilai.salah}</td>
-                <td className="py-2 px-3 text-center">{nilai.skor}</td>
+                <td className="py-2 px-3 text-center font-bold">{nilai.skor}</td>
                 <td className="py-2 px-3">
                   {nilai.created_at
                     ? formatDate(nilai.created_at.toString())
