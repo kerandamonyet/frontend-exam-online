@@ -96,7 +96,7 @@ function SesiLatihanTable({ data, setData, currentPage, itemsPerPage }) {
                 </td>
                 <td className="flex justify-center gap-1 py-2 px-3">
                   <DeleteButton
-                    id={sesi_latihan.id_sesi_latihan}
+                    id={sesi_latihan.id_sesi}
                     onDelete={handleDelete}
                   />
                 </td>

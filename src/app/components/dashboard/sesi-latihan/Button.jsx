@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { IoAddSharp, IoPencil, IoTrashOutline } from "react-icons/io5";
 import Swal from "sweetalert2";
-import { deleteLatihan } from "../../../../../lib/data";
+import { deleteSesiLatihan } from "../../../../../lib/data";
 import { FaEye } from "react-icons/fa6";
 
 export const DeleteButton = ({ id, onDelete }) => {
@@ -20,7 +20,7 @@ export const DeleteButton = ({ id, onDelete }) => {
 
     if (result.isConfirmed) {
       try {
-        const response = await deleteLatihan(id);
+        const response = await deleteSesiLatihan(id);
         if (response.status === 200) {
           // Tampilkan alert sukses sebelum memperbarui tabel
           await Swal.fire({

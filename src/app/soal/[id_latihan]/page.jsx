@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -19,37 +19,20 @@ import ReviewMode from "@/app/components/soal/ReviewMode";
 
 export default function SoalPage() {
   const router = useRouter();
-  const { id_latihan, id_siswa } = useParams();
+  const { id_latihan } = useParams();
   const MySwal = withReactContent(Swal);
   const [soal, setSoal] = useState([]);
   const [formData, setFormData] = useState({ id_siswa: "", jawaban_siswa: {} });
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(60 * 60); // 60 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(60 * 0.1); // 60 minutes in seconds
   const [unsureQuestions, setUnsureQuestions] = useState({}); // Track unsure questions
   const [isReviewMode, setIsReviewMode] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackType, setFeedbackType] = useState("success");
-
-  // Timer effect
-  useEffect(() => {
-    if (!loading) {
-      const timer = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 0) {
-            clearInterval(timer);
-            alert("Waktu habis! Jawaban akan disimpan otomatis.");
-            submitAllAnswers();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [loading]);
+  const [isTimerExpired, setIsTimerExpired] = useState(false);
 
   useEffect(() => {
     const tokenJWT = Cookies.get("auth-token");
@@ -135,27 +118,37 @@ export default function SoalPage() {
   const submitAllAnswers = async () => {
     if (submitting || submitted) return;
 
+    const hasAnswers = Object.keys(formData.jawaban_siswa).length > 0;
+    if (!hasAnswers) {
+      const result = await MySwal.fire({
+        icon: "warning",
+        title: "Tidak Ada Jawaban",
+        text: "Anda belum menjawab satu pun soal. Yakin ingin mengirim?",
+        showCancelButton: true,
+        confirmButtonText: "Ya, Kirim",
+        cancelButtonText: "Batalkan",
+        reverseButtons: true,
+      });
+
+      // If user cancels, stop the submission process
+      if (!result.isConfirmed) {
+        return;
+      }
+    }
     setSubmitting(true);
 
     try {
-      // Format data sesuai dengan yang diharapkan oleh API
-      const formattedAnswers = Object.keys(formData.jawaban_siswa).map(
-        (id_soal) => ({
-          id_soal,
-          jawaban_siswa: formData.jawaban_siswa[id_soal],
-        })
-      );
-
-      // Request body yang diharapkan server
+      // Prepare submission data
       const requestBody = {
         id_siswa: formData.id_siswa,
-        jawaban_siswa: formattedAnswers,
+        jawaban_siswa: Object.keys(formData.jawaban_siswa).map((id_soal) => ({
+          id_soal,
+          jawaban_siswa: formData.jawaban_siswa[id_soal],
+        })),
         id_latihan,
+        submissionType: hasAnswers ? "partial" : "empty",
       };
 
-      console.log("Submitting data:", JSON.stringify(requestBody, null, 2));
-
-      // Tambahkan error handling yang lebih baik
       const response = await axios.post(
         "http://localhost:5000/api/jawaban/submit",
         requestBody,
@@ -166,43 +159,100 @@ export default function SoalPage() {
         }
       );
 
-      console.log("Response:", response.data);
-
       setSubmitted(true);
-      MySwal.fire({
-        icon: "success",
-        title: "Berhasil!",
-        text: "Kirim jawaban berhasil!",
-      });
-      // Redirect ke halaman hasil menggunakan id_latihan dan id_siswa dari formData
+
+      // Different messages based on whether answers were submitted
+      if (hasAnswers) {
+        await MySwal.fire({
+          icon: "success",
+          title: "Berhasil!",
+          text: "Jawaban Anda telah dikirim.",
+        });
+      } else {
+        await MySwal.fire({
+          icon: "info",
+          title: "Ujian Selesai",
+          text: "Anda mengirim ujian tanpa menjawab satu pun soal.",
+        });
+      }
+
+      // Only show success modal if not already shown during timer expiration
+      if (!isTimerExpired) {
+        await MySwal.fire({
+          icon: "success",
+          title: "Berhasil!",
+          text: "Kirim jawaban berhasil!",
+        });
+      }
+
+      // Redirect to results page
       router.push(`/hasil/${id_latihan}/${formData.id_siswa}`);
     } catch (error) {
       console.error("Error submitting answers:", error);
 
-      // Log lebih detail tentang error
+      // Comprehensive error handling
       if (error.response) {
-        // Server meresponse dengan status kode error
-        console.error("Response data:", error.response.data);
-        console.error("Response status:", error.response.status);
-        console.error("Response headers:", error.response.headers);
-        alert(
-          `Gagal menyimpan jawaban: ${
-            error.response.data.message || "Server error"
-          }`
-        );
+        await MySwal.fire({
+          icon: "error",
+          title: "Gagal Mengirim Jawaban",
+          text:
+            error.response.data.message ||
+            "Terjadi kesalahan saat mengirim jawaban",
+        });
       } else if (error.request) {
-        // Request dibuat tapi tidak ada response
-        console.error("No response received:", error.request);
-        alert("Gagal menyimpan jawaban: Tidak ada respon dari server");
+        await MySwal.fire({
+          icon: "error",
+          title: "Tidak Ada Respon",
+          text: "Tidak dapat terhubung ke server. Silakan periksa koneksi internet Anda.",
+        });
       } else {
-        // Error saat setup request
-        console.error("Error message:", error.message);
-        alert(`Gagal menyimpan jawaban: ${error.message}`);
+        await MySwal.fire({
+          icon: "error",
+          title: "Kesalahan",
+          text: error.message,
+        });
       }
     } finally {
       setSubmitting(false);
     }
   };
+
+  // Modify the timer expiration handler to use the same submission logic
+  const handleTimerExpiration = useCallback(async () => {
+    if (isTimerExpired) return;
+
+    setIsTimerExpired(true);
+
+    await MySwal.fire({
+      icon: "warning",
+      title: "Waktu Habis!",
+      text: "Ujian telah berakhir. Jawaban akan dikirim secara otomatis.",
+      confirmButtonText: "OK",
+      allowOutsideClick: false,
+    });
+
+    // Call the same submission method
+    await submitAllAnswers();
+  }, [isTimerExpired, submitAllAnswers, MySwal]);
+
+  // Timer effect
+  useEffect(() => {
+    if (!loading) {
+      const timer = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 0) {
+            clearInterval(timer);
+            handleTimerExpiration();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      // Cleanup interval on component unmount
+      return () => clearInterval(timer);
+    }
+  }, [loading, handleTimerExpiration]);
 
   // Calculate stats
   const getStats = () => {
