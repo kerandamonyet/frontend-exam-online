@@ -17,6 +17,41 @@ import FeedbackToast from "@/app/components/soal/FeedbackToast";
 import NavigationPanel from "@/app/components/soal/NavigationPanel";
 import ReviewMode from "@/app/components/soal/ReviewMode";
 
+/**
+ * Fisher-Yates (Knuth) Shuffle Algorithm
+ * @param {Array} array - The array to be shuffled
+ * @returns {Array} - The shuffled array (new copy)
+ */
+function fisherYatesShuffle(array) {
+  const arrayCopy = [...array]; // Create a copy to not modify the original
+  const length = arrayCopy.length;
+
+  for (let i = length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arrayCopy[i], arrayCopy[j]] = [arrayCopy[j], arrayCopy[i]];
+  }
+
+  return arrayCopy;
+}
+
+// Helper function to get session storage data with a default value
+const getFromStorage = (key, defaultValue) => {
+  if (typeof window === "undefined") return defaultValue;
+  const stored = sessionStorage.getItem(key);
+  if (stored === null) return defaultValue;
+  try {
+    return JSON.parse(stored);
+  } catch (e) {
+    return defaultValue;
+  }
+};
+
+// Helper function to save data to session storage
+const saveToStorage = (key, value) => {
+  if (typeof window === "undefined") return;
+  sessionStorage.setItem(key, JSON.stringify(value));
+};
+
 export default function SoalPage() {
   const router = useRouter();
   const { id_latihan } = useParams();
@@ -25,15 +60,17 @@ export default function SoalPage() {
   const [formData, setFormData] = useState({ id_siswa: "", jawaban_siswa: {} });
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(60 * 0.1); // 60 minutes in seconds
-  const [unsureQuestions, setUnsureQuestions] = useState({}); // Track unsure questions
+  const [timeLeft, setTimeLeft] = useState(60 * 60); // Default: 60 minutes in seconds
+  const [unsureQuestions, setUnsureQuestions] = useState({});
   const [isReviewMode, setIsReviewMode] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackType, setFeedbackType] = useState("success");
   const [isTimerExpired, setIsTimerExpired] = useState(false);
+  const [startTime, setStartTime] = useState(null);
 
+  // Load user data from token
   useEffect(() => {
     const tokenJWT = Cookies.get("auth-token");
     if (!tokenJWT) {
@@ -54,20 +91,107 @@ export default function SoalPage() {
     }
   }, [router]);
 
+  // Load questions and restore state from session storage
   useEffect(() => {
     if (id_latihan) {
+      // Restore saved state from session storage first
+      const storageKey = `quiz_${id_latihan}`;
+      const savedState = getFromStorage(storageKey, null);
+
+      if (savedState) {
+        // Restore all saved state
+        setFormData((prev) => ({
+          ...prev,
+          jawaban_siswa: savedState.jawaban_siswa || {},
+        }));
+        setCurrentIndex(savedState.currentIndex || 0);
+        setUnsureQuestions(savedState.unsureQuestions || {});
+        setIsReviewMode(savedState.isReviewMode || false);
+        setStartTime(savedState.startTime);
+        setSubmitted(savedState.submitted || false);
+
+        // If we have saved questions, use those to maintain question order
+        if (savedState.questions && savedState.questions.length > 0) {
+          setSoal(savedState.questions);
+        }
+
+        // Calculate remaining time based on saved start time
+        if (savedState.startTime) {
+          const elapsedSeconds = Math.floor(
+            (Date.now() - savedState.startTime) / 1000
+          );
+          const remaining = Math.max(0, 60 * 60 - elapsedSeconds);
+          setTimeLeft(remaining);
+          // If time already expired while away
+          if (remaining <= 0 && !savedState.submitted) {
+            setIsTimerExpired(true);
+          }
+        }
+      } else {
+        // If no saved state, set the start time now
+        const now = Date.now();
+        setStartTime(now);
+        saveToStorage(storageKey, { startTime: now });
+      }
+
+      // Load questions from API
       axios
         .get(`http://localhost:5000/api/latihan/${id_latihan}/soal`)
         .then((response) => {
           const data = response.data.data || [];
           // Limit to only 30 questions
-          const limitedData = Array.isArray(data) ? data.slice(0, 30) : [];
+          let limitedData = Array.isArray(data) ? data.slice(0, 30) : [];
+
+          // Only shuffle questions if we don't have saved questions
+          // This ensures question order remains the same after refresh
+          if (
+            !savedState ||
+            !savedState.questions ||
+            savedState.questions.length === 0
+          ) {
+            limitedData = fisherYatesShuffle(limitedData);
+
+            // Save the shuffled questions to storage
+            saveToStorage(storageKey, {
+              ...getFromStorage(storageKey, {}),
+              questions: limitedData,
+            });
+          }
+
           setSoal(limitedData);
         })
         .catch((error) => console.error("Gagal mengambil soal:", error))
         .finally(() => setLoading(false));
     }
   }, [id_latihan]);
+
+  // And update the storage effect to also save the shuffled questions:
+  useEffect(() => {
+    if (!loading && id_latihan) {
+      const storageKey = `quiz_${id_latihan}`;
+      saveToStorage(storageKey, {
+        jawaban_siswa: formData.jawaban_siswa,
+        currentIndex,
+        unsureQuestions,
+        isReviewMode,
+        startTime,
+        submitted,
+        timeLeft,
+        questions: soal, // Save the questions array to maintain order on refresh
+      });
+    }
+  }, [
+    formData.jawaban_siswa,
+    currentIndex,
+    unsureQuestions,
+    isReviewMode,
+    startTime,
+    submitted,
+    timeLeft,
+    soal, // Add this dependency
+    loading,
+    id_latihan,
+  ]);
 
   const handleJawabanChange = (jawaban) => {
     setFormData((prev) => ({
@@ -114,7 +238,6 @@ export default function SoalPage() {
   };
 
   // Function to submit all answers at once
-  // Fungsi untuk mengirim semua jawaban
   const submitAllAnswers = async () => {
     if (submitting || submitted) return;
 
@@ -160,6 +283,11 @@ export default function SoalPage() {
       );
 
       setSubmitted(true);
+
+      // Clear session storage after successful submission
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem(`quiz_${id_latihan}`);
+      }
 
       // Different messages based on whether answers were submitted
       if (hasAnswers) {
@@ -237,10 +365,10 @@ export default function SoalPage() {
 
   // Timer effect
   useEffect(() => {
-    if (!loading) {
+    if (!loading && timeLeft > 0 && !submitted) {
       const timer = setInterval(() => {
         setTimeLeft((prev) => {
-          if (prev <= 0) {
+          if (prev <= 1) {
             clearInterval(timer);
             handleTimerExpiration();
             return 0;
@@ -251,8 +379,11 @@ export default function SoalPage() {
 
       // Cleanup interval on component unmount
       return () => clearInterval(timer);
+    } else if (timeLeft <= 0 && !submitted && !isTimerExpired) {
+      // In case the time expired between refreshes
+      handleTimerExpiration();
     }
-  }, [loading, handleTimerExpiration]);
+  }, [loading, handleTimerExpiration, timeLeft, submitted, isTimerExpired]);
 
   // Calculate stats
   const getStats = () => {
@@ -264,6 +395,13 @@ export default function SoalPage() {
       totalUnanswered: soal.length - Object.keys(formData.jawaban_siswa).length,
     };
   };
+
+  // Auto-submit if timer expired after refresh
+  useEffect(() => {
+    if (!loading && timeLeft <= 0 && !submitted && !isTimerExpired) {
+      handleTimerExpiration();
+    }
+  }, [loading, timeLeft, submitted, isTimerExpired, handleTimerExpiration]);
 
   if (loading) return <LoadingScreen />;
   if (!soal.length)

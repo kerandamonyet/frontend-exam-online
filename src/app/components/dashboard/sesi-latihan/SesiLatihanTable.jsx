@@ -44,6 +44,30 @@ function SesiLatihanTable({ data, setData, currentPage, itemsPerPage }) {
     }
   };
 
+  // Function to render status with appropriate styling
+  const renderStatus = (status) => {
+    switch (status) {
+      case "sedang_berlangsung":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+            Berlangsung
+          </span>
+        );
+      case "selesai":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+            Selesai
+          </span>
+        );
+      default:
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+            {status}
+          </span>
+        );
+    }
+  };
+
   return (
     <table className="w-full text-xs text-left text-gray-500">
       <thead className="text-xs text-gray-700 uppercase bg-gray-50">
@@ -88,7 +112,9 @@ function SesiLatihanTable({ data, setData, currentPage, itemsPerPage }) {
                     ? formatDate(sesi_latihan.waktu_selesai.toString())
                     : "Belum Selesai"}
                 </td>
-                <td className="py-2 px-3">{sesi_latihan.status}</td>
+                <td className="py-2 px-3">
+                  {renderStatus(sesi_latihan.status)}
+                </td>
                 <td className="py-2 px-3">
                   {sesi_latihan.created_at
                     ? formatDate(sesi_latihan.created_at.toString())

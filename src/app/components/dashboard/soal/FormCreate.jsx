@@ -342,7 +342,7 @@ function FormCreate({ onSubmit }) {
   };
 
   return (
-    <div className="max-w-screen-md mx-auto p-6 card border border-md shadow-lg bg-white rounded-lg">
+    <div className="max-w-screen-xl mx-auto p-4 sm:p-6 card border border-md shadow-lg bg-white rounded-lg">
       <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">
         Tambah Soal
       </h3>
@@ -371,12 +371,13 @@ function FormCreate({ onSubmit }) {
             <p className="text-red-500 text-sm mt-1">{errors.latihan_id}</p>
           )}
         </div>
+
         {/* Tipe Soal */}
         <div className="form-group">
           <label className="block text-sm font-semibold mb-3 text-gray-700">
             Tipe Soal
           </label>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div
               className={`flex items-center p-3 border rounded-md ${
                 formData.tipe_soal === "pilihan_ganda"
@@ -423,31 +424,9 @@ function FormCreate({ onSubmit }) {
                 Tarik Garis
               </label>
             </div>
-            <div
-              className={`flex items-center p-3 border rounded-md ${
-                formData.tipe_soal === "drag_drop"
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              <input
-                id="radio-drag-drop"
-                type="radio"
-                value="drag_drop"
-                name="tipe_soal"
-                checked={formData.tipe_soal === "drag_drop"}
-                onChange={handleChange}
-                className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="radio-drag-drop"
-                className="ml-2 text-sm font-medium text-gray-900 w-full cursor-pointer"
-              >
-                Drag and Drop
-              </label>
-            </div>
           </div>
         </div>
+
         {/* Soal menggunakan Quill */}
         <div className="form-group">
           <label className="block text-sm font-semibold mb-2 text-gray-700">
@@ -464,6 +443,7 @@ function FormCreate({ onSubmit }) {
             <p className="text-red-500 text-sm mt-1">{errors.text_soal}</p>
           )}
         </div>
+
         {/* Multiple Choice Options */}
         {formData.tipe_soal === "pilihan_ganda" && (
           <div className="form-group">
@@ -474,29 +454,34 @@ function FormCreate({ onSubmit }) {
               {["a", "b", "c", "d"].map((option, index) => (
                 <div
                   key={option}
-                  className={`flex items-center gap-2 p-3 border rounded-md ${
+                  className={`flex flex-col sm:flex-row sm:items-center gap-2 p-3 border rounded-md ${
                     correctAnswer === option
                       ? "border-green-500 bg-green-50"
                       : "border-gray-300 hover:bg-gray-50"
                   }`}
                 >
-                  <input
-                    type="radio"
-                    name="correctAnswer"
-                    value={option}
-                    checked={correctAnswer === option}
-                    onChange={() => handleCorrectAnswerChange(option)}
-                    className="h-6 w-6 accent-blue-600 focus:ring-2 focus:ring-black"
-                  />
-                  <span className="text-sm font-medium min-w-[80px]">
-                    Pilihan {option.toUpperCase()}:
-                  </span>
-                  <input
-                    type="text"
+                  <div className="flex items-center gap-2 mb-2 sm:mb-0">
+                    <input
+                      type="radio"
+                      name="correctAnswer"
+                      id={`answer-${option}`}
+                      value={option}
+                      checked={correctAnswer === option}
+                      onChange={() => handleCorrectAnswerChange(option)}
+                      className="h-5 w-5 accent-blue-600 focus:ring-2 focus:ring-black"
+                    />
+                    <label
+                      htmlFor={`answer-${option}`}
+                      className="text-sm font-medium min-w-[80px]"
+                    >
+                      Pilihan {option.toUpperCase()}:
+                    </label>
+                  </div>
+                  <textarea
                     value={options[index]}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
                     placeholder={`Isi opsi ${option.toUpperCase()}`}
-                    className="border p-2 rounded-md flex-1 focus:ring focus:ring-blue-200 focus:outline-none"
+                    className="border p-2 rounded-md flex-1 focus:ring focus:ring-blue-200 focus:outline-none min-h-[60px] resize-y"
                   />
                 </div>
               ))}
@@ -511,119 +496,223 @@ function FormCreate({ onSubmit }) {
             </div>
           </div>
         )}
-        {/* Tarik Garis Interface */}
+
+        {/* Tarik Garis Interface - Improved for mobile and wider inputs */}
         {formData.tipe_soal === "tarik_garis" && (
           <div className="form-group">
-            <div className="flex justify-between items-center mb-3">
-              <label className="block text-sm font-semibold text-gray-700">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2">
+              <label className="text-sm font-semibold text-gray-700">
                 Pasangan Tarik Garis <span className="text-red-500">*</span>
               </label>
               <button
                 type="button"
                 onClick={addTarikGarisRow}
-                className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"
+                className="px-3 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm flex items-center justify-center sm:self-end"
               >
-                + Tambah Pasangan
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-1"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Tambah Pasangan
               </button>
             </div>
 
-            <div className="space-y-3">
-              <div className="grid grid-cols-5 gap-2 px-2 pb-2 font-medium text-sm">
-                <div className="col-span-2">Opsi Kiri</div>
-                <div className="col-span-2">Opsi Kanan</div>
-                <div></div>
+            <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 mb-2">
+              <p className="text-sm text-gray-600 mb-2">
+                Petunjuk: Isi opsi kiri dan kanan, lalu pilih pasangannya dari
+                dropdown.
+              </p>
+
+              {/* Instructions for better UX */}
+              <div className="hidden sm:block mb-3">
+                <div className="grid grid-cols-12 gap-3 px-2 pb-2 font-medium text-sm text-gray-700">
+                  <div className="col-span-5">Opsi Kiri</div>
+                  <div className="col-span-2 text-center">Pasangan</div>
+                  <div className="col-span-4">Opsi Kanan</div>
+                  <div className="col-span-1"></div>
+                </div>
               </div>
 
-              {leftOptions.map((leftOption, index) => (
-                <div key={index} className="grid grid-cols-5 gap-2">
-                  <input
-                    type="text"
-                    value={leftOption}
-                    onChange={(e) =>
-                      handleLeftOptionChange(index, e.target.value)
-                    }
-                    placeholder="Isi opsi kiri"
-                    className="col-span-2 border p-2 rounded-md focus:ring focus:ring-blue-200 focus:outline-none"
-                  />
-
-                  <select
-                    value={matchingPairs[leftOption] || ""}
-                    onChange={(e) =>
-                      handleMatchPairChange(leftOption, e.target.value)
-                    }
-                    className="col-span-2 border p-2 rounded-md focus:ring focus:ring-blue-200 focus:outline-none"
-                    disabled={!leftOption}
+              <div className="space-y-4">
+                {leftOptions.map((leftOption, index) => (
+                  <div
+                    key={index}
+                    className="relative border border-gray-200 rounded-lg p-3 bg-white"
                   >
-                    <option value="">Pilih Pasangan</option>
-                    {rightOptions.map(
-                      (rightOption, idx) =>
-                        rightOption && (
-                          <option key={idx} value={rightOption}>
-                            {rightOption}
-                          </option>
-                        )
-                    )}
-                  </select>
+                    {/* Mobile layout with labels */}
+                    <div className="sm:hidden text-xs font-medium text-gray-500 mb-1">
+                      Pasangan {index + 1}
+                    </div>
 
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={rightOptions[index]}
-                      onChange={(e) =>
-                        handleRightOptionChange(index, e.target.value)
-                      }
-                      placeholder="Isi opsi kanan"
-                      className="border p-2 rounded-md w-full focus:ring focus:ring-blue-200 focus:outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeTarikGarisRow(index)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded-md"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    {/* Responsive grid layout */}
+                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                      {/* Left option */}
+                      <div className="sm:col-span-5">
+                        <label className="block sm:hidden text-xs text-gray-500 mb-1">
+                          Opsi Kiri:
+                        </label>
+                        <textarea
+                          value={leftOption}
+                          onChange={(e) =>
+                            handleLeftOptionChange(index, e.target.value)
+                          }
+                          placeholder="Isi opsi kiri"
+                          className="w-full border p-2 rounded-md focus:ring focus:ring-blue-200 focus:outline-none min-h-[80px] resize-y"
                         />
-                      </svg>
-                    </button>
+                      </div>
+
+                      {/* Dropdown for matching */}
+                      <div className="sm:col-span-2">
+                        <label className="block sm:hidden text-xs text-gray-500 mb-1">
+                          Pasangan:
+                        </label>
+                        <div className="flex items-center justify-center h-full">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6 text-gray-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M13 5l7 7-7 7M5 5l7 7-7 7"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+
+                      {/* Right option */}
+                      <div className="sm:col-span-4">
+                        <label className="block sm:hidden text-xs text-gray-500 mb-1">
+                          Opsi Kanan:
+                        </label>
+                        <textarea
+                          value={rightOptions[index]}
+                          onChange={(e) =>
+                            handleRightOptionChange(index, e.target.value)
+                          }
+                          placeholder="Isi opsi kanan"
+                          className="w-full border p-2 rounded-md focus:ring focus:ring-blue-200 focus:outline-none min-h-[80px] resize-y"
+                        />
+                      </div>
+
+                      {/* Delete button */}
+                      <div className="sm:col-span-1 flex justify-end items-center">
+                        <button
+                          type="button"
+                          onClick={() => removeTarikGarisRow(index)}
+                          className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                          aria-label="Hapus pasangan"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Matching selection - shown under inputs on mobile */}
+                    <div className="mt-3 sm:hidden">
+                      <label className="block text-xs text-gray-500 mb-1">
+                        Pilih Pasangan:
+                      </label>
+                      <select
+                        value={matchingPairs[leftOption] || ""}
+                        onChange={(e) =>
+                          handleMatchPairChange(leftOption, e.target.value)
+                        }
+                        className="w-full border p-2 rounded-md focus:ring focus:ring-blue-200 focus:outline-none"
+                        disabled={!leftOption}
+                      >
+                        <option value="">
+                          Pilih pasangan untuk "{leftOption}"
+                        </option>
+                        {rightOptions.map(
+                          (rightOption, idx) =>
+                            rightOption && (
+                              <option key={idx} value={rightOption}>
+                                {rightOption}
+                              </option>
+                            )
+                        )}
+                      </select>
+                    </div>
+
+                    {/* Desktop matching dropdown - shown alongside inputs */}
+                    <div className="hidden sm:block sm:absolute sm:top-14 sm:left-1/2 sm:transform sm:-translate-x-1/2">
+                      <select
+                        value={matchingPairs[leftOption] || ""}
+                        onChange={(e) =>
+                          handleMatchPairChange(leftOption, e.target.value)
+                        }
+                        className="border p-2 rounded-md focus:ring focus:ring-blue-200 focus:outline-none text-sm w-32"
+                        disabled={!leftOption}
+                      >
+                        <option value="">Pilih pasangan</option>
+                        {rightOptions.map(
+                          (rightOption, idx) =>
+                            rightOption && (
+                              <option key={idx} value={rightOption}>
+                                {rightOption.length > 20
+                                  ? rightOption.substring(0, 20) + "..."
+                                  : rightOption}
+                              </option>
+                            )
+                        )}
+                      </select>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
 
               {errors.leftOptions && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm mt-2">
                   {errors.leftOptions}
                 </p>
               )}
               {errors.rightOptions && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm mt-2">
                   {errors.rightOptions}
                 </p>
               )}
               {errors.matchingPairs && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-sm mt-2">
                   {errors.matchingPairs}
                 </p>
               )}
             </div>
           </div>
         )}
+
         {/* Action Buttons */}
-        <div className="flex justify-end space-x-3 pt-4 border-t">
-          <Link href="/dashboard/soal">
+        <div className="flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4 border-t">
+          <Link href="/dashboard/soal" className="w-full sm:w-auto">
             <button
               type="button"
               disabled={pending}
-              className="px-4 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition"
+              className="w-full px-4 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition"
             >
               Kembali
             </button>
@@ -631,14 +720,14 @@ function FormCreate({ onSubmit }) {
           <button
             type="submit"
             disabled={pending}
-            className={`px-5 py-2.5 text-white rounded-md transition ${
+            className={`w-full sm:w-auto px-5 py-2.5 text-white rounded-md transition ${
               pending
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
             {pending ? (
-              <span className="flex items-center">
+              <span className="flex items-center justify-center">
                 <svg
                   className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                   xmlns="http://www.w3.org/2000/svg"
