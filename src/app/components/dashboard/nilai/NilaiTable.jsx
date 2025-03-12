@@ -55,6 +55,7 @@ function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
           <th className="py-2 px-3 text-center">Total Soal</th>
           <th className="py-2 px-3 text-center">Benar</th>
           <th className="py-2 px-3 text-center">Salah</th>
+          <th className="py-2 px-3 text-center">Soal dijawab</th>
           <th className="py-2 px-3 text-center">Skor</th>
           <th className="py-2 px-3">Created At</th>
           {/* <th className="py-2 px-3 text-center">Action</th> */}
@@ -81,9 +82,10 @@ function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
                 <td className="py-2 px-3">{nilai.id}</td>
                 <td className="py-2 px-3">{namaSiswa}</td>
                 <td className="py-2 px-3">{namaLatihan}</td>
-                <td className="py-2 px-3 text-center">{nilai.total_soal}</td>
+                <td className="py-2 px-3 text-center">30</td>
                 <td className="py-2 px-3 text-center">{nilai.benar}</td>
                 <td className="py-2 px-3 text-center">{nilai.salah}</td>
+                <td className="py-2 px-3 text-center">{nilai.total_soal}</td>
                 <td className="py-2 px-3 text-center font-bold">{nilai.skor}</td>
                 <td className="py-2 px-3">
                   {nilai.created_at

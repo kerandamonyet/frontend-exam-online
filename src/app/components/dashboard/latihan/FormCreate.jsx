@@ -13,38 +13,19 @@ function FormCreate({ onSubmit }) {
   // State untuk input teks/number (tanpa tanggal/waktu)
   const [formData, setFormData] = useState({
     nama_latihan: "",
-    kelas_id: "",
-    tipe_latihan: "AKM", // default pilih AKM
+    tipe_latihan: "Literasi", // default pilih Literasi
   });
 
   const [errors, setErrors] = useState({});
   const [pending, setPending] = useState(false);
-  const [kelasList, setKelasList] = useState([]); // Inisialisasi sebagai array kosong
   // State untuk tanggal dan waktu menggunakan react-datepicker
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-
-  // Ambil daftar kelas dari database saat modal dibuka
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/kelas")
-      .then((res) => {
-        console.log("Data dari API:", res.data); // Debugging
-        setKelasList(Array.isArray(res.data) ? res.data : res.data.data || []);
-      })
-      .catch((err) => {
-        console.error("Error fetching kelas:", err);
-        setKelasList([]); // Hindari crash jika error
-      });
-  });
 
   // Validasi Form
   const validate = () => {
     let newErrors = {};
 
-    if (!formData.kelas_id.trim()) {
-      newErrors.kelas_id = "Kelas wajib diisi";
-    }
     if (!formData.nama_latihan.trim()) {
       newErrors.nama_latihan = "Kelas wajib diisi";
     }
@@ -100,7 +81,6 @@ function FormCreate({ onSubmit }) {
 
       await axios.post("http://localhost:5000/api/latihan", {
         nama_latihan: formData.nama_latihan,
-        kelas_id: formData.kelas_id,
         tipe_latihan: formData.tipe_latihan,
         tgl_mulai: datetimeMulai,
         tgl_selesai: datetimeSelesai,
@@ -117,8 +97,7 @@ function FormCreate({ onSubmit }) {
       // Reset form data dan datepicker ke nilai awal
       setFormData({
         nama_latihan: "",
-        kelas_id: "",
-        tipe_latihan: "AKM",
+        tipe_latihan: "Literasi",
         durasi: "",
       });
       setStartDate(new Date());
@@ -136,17 +115,17 @@ function FormCreate({ onSubmit }) {
 
   return (
     <div className="max-w-screen-md mx-auto p-6 card border border-md shadow-lg">
-      <h3 className="text-lg font-semibold mb-4">Tambah Latihan</h3>
+      <h3 className="text-lg font-bold mb-4">Tambah Latihan</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Nama Latihan */}
         <div>
-          <label className="block text-sm font-medium mb-2">Nama Latihan</label>
+          <label className="block text-sm font-semibold mb-2">Nama Latihan</label>
           <input
             type="text"
             name="nama_latihan"
             value={formData.nama_latihan}
             onChange={handleChange}
-            placeholder="Latihan AKM 1 - Kelas A"
+            placeholder="Latihan Literasi 1"
             required
             className={`w-full p-2 border rounded ${
               errors.nama_latihan ? "border-red-500" : "border-gray-300"
@@ -157,79 +136,58 @@ function FormCreate({ onSubmit }) {
           )}
         </div>
 
-        {/* Kelas ID (Dropdown) */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Kelas</label>
-          <select
-            name="kelas_id"
-            value={formData.kelas_id}
-            onChange={handleChange}
-            className={`w-full p-2 border rounded ${
-              errors.kelas_id ? "border-red-500" : "border-gray-300"
-            }`}
-          >
-            <option value="">Pilih Kelas</option>
-            {kelasList.map((kelas) => (
-              <option key={kelas.id} value={kelas.id}>
-                {kelas.nama_kelas}
-              </option>
-            ))}
-          </select>
-          {errors.kelas_id && (
-            <p className="text-red-500 text-sm mt-1">{errors.kelas_id}</p>
-          )}
-        </div>
-
         {/* Input Tipe Latihan */}
         <div>
-          <label className="block text-sm font-medium mb-2">Mata Pelajaran</label>
+          <label className="block text-sm font-semibold mb-2">
+            Mata Pelajaran
+          </label>
           <div className="flex items-center mb-2">
             <input
               defaultChecked
-              id="radio-AKM"
+              id="radio-Literasi"
               type="radio"
-              value="AKM"
+              value="Literasi"
               name="tipe_latihan"
               onChange={handleChange}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
             />
             <label
-              htmlFor="radio-AKM"
+              htmlFor="radio-Literasi"
               className="ml-2 text-sm font-medium text-gray-900"
             >
-              AKM
+              Literasi
             </label>
           </div>
           <div className="flex items-center mb-2">
             <input
-              id="radio-SLB"
+              id="radio-Numerasi"
               type="radio"
-              value="SLB"
+              value="Numerasi"
               name="tipe_latihan"
               onChange={handleChange}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
             />
             <label
-              htmlFor="radio-SLB"
+              htmlFor="radio-Numerasi"
               className="ml-2 text-sm font-medium text-gray-900"
             >
-              SLB
+              Numerasi
             </label>
           </div>
           <div className="flex items-center mb-2">
             <input
-              id="radio-Literasi-Numerik"
+              id="radio-Karakter"
               type="radio"
-              value="Literasi Numerik"
+              value="Karakter"
               name="tipe_latihan"
               onChange={handleChange}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
             />
             <label
-              htmlFor="radio-Literasi-Numerik"
+              htmlFor="radio-Karakter"
               className="ml-2 text-sm font-medium text-gray-900"
             >
-              Literasi Numerik
+              Karakter
             </label>
           </div>
           {errors.tipe_latihan && (
@@ -240,7 +198,7 @@ function FormCreate({ onSubmit }) {
         {/* Input Tanggal Mulai dan Tanggal Selesai */}
         <div className="flex flex-1 gap-3">
           <div>
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-sm font-semibold mb-2">
               Tanggal Mulai
             </label>
             <DatePicker
@@ -257,7 +215,7 @@ function FormCreate({ onSubmit }) {
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-sm font-semibold mb-2">
               Tanggal Selesai
             </label>
             <DatePicker

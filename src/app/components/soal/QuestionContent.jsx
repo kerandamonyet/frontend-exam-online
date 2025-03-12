@@ -4,6 +4,7 @@ import {
   FaEye,
   FaQuestion,
   FaSave,
+  FaUndo,
 } from "react-icons/fa";
 import { useState, useEffect, useRef } from "react";
 
@@ -120,10 +121,17 @@ export default function QuestionContent({
     }
   };
 
+  // Reset all line connections
+  const handleResetAllConnections = () => {
+    setConnections({});
+    onAnswerChange(JSON.stringify({}));
+    setSelectedLeft(null);
+  };
+
   // Render content based on question type
   const renderQuestionContent = () => {
     if (currentSoal.tipe_soal === "pilihan_ganda") {
-      // Render multiple choice options
+      // Multiple choice options rendering
       const options = [
         currentSoal.opsi_a,
         currentSoal.opsi_b,
@@ -166,13 +174,34 @@ export default function QuestionContent({
         </div>
       );
     } else if (currentSoal.tipe_soal === "tarik_garis") {
-      // Render line matching question
+      // Improved line matching question for mobile
       const dataTarikGaris = currentSoal.data_tarik_garis || {};
       const opsiKiri = dataTarikGaris.opsi_kiri || [];
       const opsiKanan = dataTarikGaris.opsi_kanan || [];
 
       return (
-        <div ref={containerRef} className="relative mt-8">
+        <div ref={containerRef} className="relative mt-4">
+          {/* Instructions with better visibility */}
+          <div className="mb-4 p-3 bg-blue-50 rounded-lg text-blue-700 text-sm flex items-center">
+            <div className="bg-blue-100 p-2 rounded-full mr-2">
+              <FaQuestion size={16} className="text-blue-600" />
+            </div>
+            <p>
+              Klik pada pertanyaan terlebih dahulu, kemudian klik pada jawaban
+              yang sesuai.
+            </p>
+          </div>
+
+          {/* Column headers with better visual distinction */}
+          <div className="grid grid-cols-2 gap-4 mb-2">
+            <div className="bg-purple-100 py-2 rounded-lg font-medium text-center text-purple-800">
+              Pertanyaan
+            </div>
+            <div className="bg-purple-100 py-2 rounded-lg font-medium text-center text-purple-800">
+              Jawaban
+            </div>
+          </div>
+
           {/* SVG for connection lines */}
           <svg
             className="absolute top-0 left-0 w-full h-full pointer-events-none"
@@ -186,26 +215,24 @@ export default function QuestionContent({
                 x2={line.x2}
                 y2={line.y2}
                 stroke={isUnsure ? "#F59E0B" : "#8B5CF6"}
-                strokeWidth="2"
+                strokeWidth="3"
               />
             ))}
           </svg>
 
-          <div className="flex flex-col md:flex-row items-stretch gap-10 md:gap-4">
+          {/* Grid layout for items - more consistent on mobile */}
+          <div className="grid grid-cols-2 gap-4 items-start z-10">
             {/* Left column - Questions */}
-            <div className="flex-1 space-y-4 z-10">
-              <div className="text-center mb-2 bg-gray-200 py-2 rounded-lg font-medium">
-                Pertanyaan
-              </div>
+            <div className="space-y-3 z-10">
               {opsiKiri.map((item, index) => (
                 <div
                   key={`left-${index}`}
                   data-key={item}
-                  className={`left-item border-2 rounded-lg p-3 cursor-pointer ${
+                  className={`left-item border-2 rounded-lg p-3 text-center flex items-center justify-center min-h-16 cursor-pointer ${
                     selectedLeft === item
                       ? isUnsure
-                        ? "border-yellow-500 bg-yellow-50"
-                        : "border-purple-500 bg-purple-50"
+                        ? "border-yellow-500 bg-yellow-50 shadow-md"
+                        : "border-purple-500 bg-purple-50 shadow-md"
                       : Object.keys(connections).includes(item)
                       ? isUnsure
                         ? "border-yellow-300 bg-yellow-50"
@@ -214,21 +241,23 @@ export default function QuestionContent({
                   }`}
                   onClick={() => handleLeftItemClick(item)}
                 >
-                  {item}
+                  {selectedLeft === item && (
+                    <div className="absolute -right-3 bg-purple-500 text-white rounded-full p-1 z-20">
+                      <FaArrowRight size={12} />
+                    </div>
+                  )}
+                  <span>{item}</span>
                 </div>
               ))}
             </div>
 
             {/* Right column - Answers */}
-            <div className="flex-1 space-y-4 z-10">
-              <div className="text-center mb-2 bg-gray-200 py-2 rounded-lg font-medium">
-                Jawaban
-              </div>
+            <div className="space-y-3 z-10">
               {opsiKanan.map((item, index) => (
                 <div
                   key={`right-${index}`}
                   data-key={item}
-                  className={`right-item border-2 rounded-lg p-3 cursor-pointer ${
+                  className={`right-item border-2 rounded-lg p-3 text-center flex items-center justify-center min-h-16 cursor-pointer ${
                     Object.values(connections).includes(item)
                       ? isUnsure
                         ? "border-yellow-300 bg-yellow-50"
@@ -237,18 +266,24 @@ export default function QuestionContent({
                   }`}
                   onClick={() => handleRightItemClick(item)}
                 >
-                  {item}
+                  <span>{item}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="mt-6 p-3 bg-blue-50 rounded-lg text-blue-700 text-sm">
-            <p>
-              Instruksi: Klik pada pertanyaan terlebih dahulu, kemudian klik
-              pada jawaban yang sesuai untuk menghubungkannya.
-            </p>
-          </div>
+          {/* Reset button separated for better visibility */}
+          {Object.keys(connections).length > 0 && (
+            <div className="mt-4 flex justify-center">
+              <button
+                onClick={handleResetAllConnections}
+                className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors flex items-center gap-2"
+              >
+                <FaUndo size={14} />
+                <span>Reset Jawaban</span>
+              </button>
+            </div>
+          )}
         </div>
       );
     } else if (currentSoal.tipe_soal === "drag_drop") {
@@ -270,8 +305,9 @@ export default function QuestionContent({
 
   return (
     <>
+      {/* Question display */}
       <div
-        className={`p-5 rounded-xl mb-4 ${
+        className={`p-4 rounded-xl mb-4 ${
           isUnsure ? "bg-yellow-50 border-2 border-yellow-200" : "bg-purple-50"
         }`}
       >
@@ -290,37 +326,36 @@ export default function QuestionContent({
       {/* Render question content based on question type */}
       {renderQuestionContent()}
 
-      {/* Navigation buttons */}
-      <div className="flex flex-wrap justify-between mt-6 gap-2">
+      {/* Improved navigation buttons - fix to bottom on mobile */}
+      <div className=" bg-white border-t border-gray-200 p-3 flex justify-between items-center">
         <button
           onClick={onPrevClick}
           disabled={isFirstQuestion}
-          className={`px-5 py-2 rounded-full flex items-center gap-2 ${
+          className={`px-3 py-2 rounded-lg flex items-center ${
             isFirstQuestion
               ? "bg-gray-200 text-gray-400 cursor-not-allowed"
               : "bg-purple-100 text-purple-600 hover:bg-purple-200"
           }`}
         >
           <FaArrowLeft size={14} />
-          <span className="hidden sm:inline">Sebelumnya</span>
+          Sebelumnya
         </button>
 
         <div className="flex gap-2">
           <button
             onClick={onToggleUnsure}
-            className={`px-5 py-2 rounded-full flex items-center gap-2 ${
+            className={`px-3 py-2 rounded-lg flex items-center ${
               isUnsure
                 ? "bg-yellow-400 text-white"
                 : "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
             }`}
           >
             <FaQuestion size={14} />
-            <span>Ragu-ragu</span>
           </button>
 
           <button
             onClick={onSaveAnswer}
-            className="px-5 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full hover:shadow-lg transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg hover:shadow-lg flex items-center gap-2"
           >
             <FaSave size={14} />
             <span>Simpan</span>
@@ -330,21 +365,23 @@ export default function QuestionContent({
         {isLastQuestion ? (
           <button
             onClick={onReviewClick}
-            className="px-5 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full hover:shadow-lg transition-all flex items-center gap-2"
+            className="px-3 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:shadow-lg flex items-center"
           >
             <FaEye size={14} />
-            <span className="hidden sm:inline">Review Jawaban</span>
           </button>
         ) : (
           <button
             onClick={onNextClick}
-            className="px-5 py-2 bg-purple-100 text-purple-600 hover:bg-purple-200 rounded-full flex items-center gap-2"
+            className="px-3 py-2 bg-purple-100 text-purple-600 hover:bg-purple-200 rounded-lg flex items-center"
           >
-            <span className="hidden sm:inline">Selanjutnya</span>
             <FaArrowRight size={14} />
+            Selanjutnya
           </button>
         )}
       </div>
+
+      {/* Add padding at the bottom to account for fixed navigation */}
+      <div className="pb-16"></div>
     </>
   );
 }
