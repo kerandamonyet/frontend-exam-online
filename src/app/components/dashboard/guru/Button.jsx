@@ -13,7 +13,7 @@ export const CreateButton = ({ onSubmit }) => {
     <>
       <button
         onClick={() => setModalOpen(true)}
-        className="inline-flex items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 px-5 py-[9px] rounded-sm text-sm"
+        className="inline-flex items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 px-5 py-[9px] rounded-md text-sm shadow-md transition-all"
       >
         <IoAddSharp size={20} />
         Create

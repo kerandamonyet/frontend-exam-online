@@ -10,6 +10,7 @@ function EditModal({ isOpen, onClose, onSubmit, siswa }) {
   if (!isOpen) return null;
 
   const [formData, setFormData] = useState({
+    nis:"",
     nama_siswa: "",
     jenis_kelamin: "",
     tgl_lahir: "",
@@ -36,6 +37,7 @@ function EditModal({ isOpen, onClose, onSubmit, siswa }) {
   useEffect(() => {
     if (siswa) {
       setFormData({
+        nis: siswa.nis || "",
         nama_siswa: siswa.nama_siswa || "",
         jenis_kelamin: siswa.jenis_kelamin || "",
         tgl_lahir: siswa.tgl_lahir || "",
@@ -46,6 +48,8 @@ function EditModal({ isOpen, onClose, onSubmit, siswa }) {
 
   const validate = () => {
     let newErrors = {};
+    if (!formData.nis.trim())
+      newErrors.nis = "Nomor Induk Siswa wajib diisi";
     if (!formData.nama_siswa.trim())
       newErrors.nama_siswa = "Nama siswa wajib diisi";
     if (!formData.kelas_id.trim()) newErrors.kelas_id = "Kelas ID wajib diisi";
@@ -104,6 +108,16 @@ function EditModal({ isOpen, onClose, onSubmit, siswa }) {
           </button>
         </div>
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+          <div>
+            <label className="block text-sm font-medium">NIS</label>
+            <input
+              type="text"
+              name="nis"
+              value={formData.nis}
+              onChange={handleChange}
+              className="w-full p-2 border rounded border-gray-300"
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium">Nama Siswa</label>
             <input

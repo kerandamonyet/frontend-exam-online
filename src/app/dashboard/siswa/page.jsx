@@ -66,7 +66,6 @@ function SiswaPage() {
             </h1>
           </div>
           <div className="flex items-center gap-2">
-            <Search />
             <CreateButton onSubmit={fetchSiswa} />
           </div>
         </div>

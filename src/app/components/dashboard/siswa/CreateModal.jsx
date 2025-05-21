@@ -10,11 +10,11 @@ function CreateModal({ isOpen, onClose, onSubmit }) {
   if (!isOpen) return null;
 
   const [formData, setFormData] = useState({
+    nis: "",
     nama_siswa: "",
     jenis_kelamin: "",
     tgl_lahir: "",
     kelas_id: "",
-    role_id: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -40,24 +40,27 @@ function CreateModal({ isOpen, onClose, onSubmit }) {
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    if (isOpen) {
-      axios
-        .get("http://localhost:5000/api/role")
-        .then((res) => {
-          console.log("Data dari API:", res.data); // Debugging
-          setRoleList(Array.isArray(res.data) ? res.data : res.data.data || []);
-        })
-        .catch((err) => {
-          console.error("Error fetching role:", err);
-          setRoleList([]); // Hindari crash jika error
-        });
-    }
-  }, [isOpen]);
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     axios
+  //       .get("http://localhost:5000/api/role")
+  //       .then((res) => {
+  //         console.log("Data dari API:", res.data); // Debugging
+  //         setRoleList(Array.isArray(res.data) ? res.data : res.data.data || []);
+  //       })
+  //       .catch((err) => {
+  //         console.error("Error fetching role:", err);
+  //         setRoleList([]); // Hindari crash jika error
+  //       });
+  //   }
+  // }, [isOpen]);
 
   // Validasi Form
   const validate = () => {
     let newErrors = {};
+    if (!formData.nis.trim()) {
+      newErrors.nis = "NIS wajib diisi";
+    }
     if (!formData.nama_siswa.trim()) {
       newErrors.nama_siswa = "Nama siswa wajib diisi";
     }
@@ -69,10 +72,6 @@ function CreateModal({ isOpen, onClose, onSubmit }) {
     }
     if (!formData.tgl_lahir.trim()) {
       newErrors.tgl_lahir = "Tanggal lahir wajib diisi";
-    }
-
-    if (!formData.role_id.trim()) {
-      newErrors.role_id = "Tanggal lahir wajib diisi";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -93,11 +92,11 @@ function CreateModal({ isOpen, onClose, onSubmit }) {
 
     try {
       await axios.post("http://localhost:5000/api/siswa", {
+        nis: formData.nis,
         nama_siswa: formData.nama_siswa,
         jenis_kelamin: formData.jenis_kelamin,
         tgl_lahir: formData.tgl_lahir,
         kelas_id: formData.kelas_id,
-        role_id: formData.role_id,
       });
 
       onSubmit();
@@ -108,11 +107,11 @@ function CreateModal({ isOpen, onClose, onSubmit }) {
       });
 
       setFormData({
+        nis: "",
         nama_siswa: "",
         jenis_kelamin: "",
         tgl_lahir: "",
         kelas_id: "",
-        role_id: "",
       });
       onClose();
     } catch (error) {
@@ -139,6 +138,26 @@ function CreateModal({ isOpen, onClose, onSubmit }) {
           </button>
         </div>
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+          {/* NIS */}
+          <div>
+            <label className="block text-sm font-medium">
+              Nomor Induk Siswa
+            </label>
+            <input
+              type="number"
+              name="nis"
+              value={formData.nis}
+              onChange={handleChange}
+              placeholder="20210810103"
+              required
+              className={`w-full p-2 border rounded ${
+                errors.nis ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+            {errors.nis && (
+              <p className="text-red-500 text-sm mt-1">{errors.nis}</p>
+            )}
+          </div>
           {/* Nama Siswa */}
           <div>
             <label className="block text-sm font-medium">Nama Siswa</label>
@@ -226,29 +245,6 @@ function CreateModal({ isOpen, onClose, onSubmit }) {
             />
             {errors.tgl_lahir && (
               <p className="text-red-500 text-sm mt-1">{errors.tgl_lahir}</p>
-            )}
-          </div>
-
-          {/* Role ID (Dropdown) */}
-          <div>
-            <label className="block text-sm font-medium">Role</label>
-            <select
-              name="role_id"
-              value={formData.role_id}
-              onChange={handleChange}
-              className={`w-full p-2 border rounded ${
-                errors.role_id ? "border-red-500" : "border-gray-300"
-              }`}
-            >
-              <option value="">Pilih Role</option>
-              {roleList.map((role) => (
-                <option key={role.role_id} value={role.role_id}>
-                  {role.role_name}
-                </option>
-              ))}
-            </select>
-            {errors.role_id && (
-              <p className="text-red-500 text-sm mt-1">{errors.role_id}</p>
             )}
           </div>
 

@@ -71,8 +71,6 @@ export default async function HasilSiswaPage({ params }) {
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-6 text-white text-center">
             <h1 className="text-3xl font-bold mb-1">Hasil Latihan Kamu</h1>
-            <h2 className="text-xl font-bold mb-1">Nama Latihan</h2>
-            <p className="text-md font-medium">{tanggalLatihan}</p>
           </div>
 
           {/* Result Card */}

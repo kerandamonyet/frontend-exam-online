@@ -95,16 +95,6 @@ function NilaiPage() {
               Daftar Nilai Siswa - Kelola Data Nilai Siswa dengan Mudah!
             </h1>
           </div>
-          <div className="flex items-center gap-2">
-            <Search />
-            <button
-              type="submit"
-              className="inline-flex items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 px-5 py-[9px] rounded-md text-sm shadow-md transition-all"
-            >
-              {" "}
-              <span>Search</span>
-            </button>
-          </div>
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-4">

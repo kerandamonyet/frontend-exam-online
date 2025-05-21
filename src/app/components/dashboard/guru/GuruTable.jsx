@@ -28,7 +28,7 @@ function GuruTable({ data, setData, currentPage, itemsPerPage }) {
         <tr>
           <th className="py-3 px-6">ID</th>
           <th className="py-3 px-6">Nama</th>
-          <th className="py-3 px-6">Email</th>
+          <th className="py-3 px-6">Username</th>
           <th className="py-3 px-6">Created At</th>
           <th className="py-3 px-6 text-center">Action</th>
         </tr>
@@ -39,7 +39,7 @@ function GuruTable({ data, setData, currentPage, itemsPerPage }) {
             <tr key={guru.id} className="border-b even:bg-white odd:bg-gray-100">
               <td className="py-3 px-6 text-center">{guru.id}</td>
               <td className="py-3 px-6">{guru.nama_guru}</td>
-              <td className="py-3 px-6">{guru.email}</td>
+              <td className="py-3 px-6">{guru.username}</td>
               <td className="py-3 px-6">
                 {guru.created_at
                   ? formatDate(guru.created_at.toString())

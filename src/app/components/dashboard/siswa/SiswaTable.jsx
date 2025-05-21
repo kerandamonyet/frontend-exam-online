@@ -44,14 +44,13 @@ function SiswaTable({ data, setData, currentPage, itemsPerPage }) {
     <table className="w-full text-xs text-left text-gray-500">
       <thead className="text-xs text-gray-700 uppercase bg-gray-50">
         <tr>
-          <th className="py-2 px-3">ID</th>
+          <th className="py-2 px-3">NIS</th>
           <th className="py-2 px-3">Username</th>
           <th className="py-2 px-3">Password</th>
           <th className="py-2 px-3">Nama</th>
           <th className="py-2 px-3">Kelas</th>
           <th className="py-2 px-3">Jenis Kelamin</th>
           <th className="py-2 px-3">Tanggal Lahir</th>
-          <th className="py-2 px-3">Role</th>
           <th className="py-2 px-3">Created At</th>
           <th className="py-2 px-3 text-center">Action</th>
         </tr>
@@ -63,16 +62,12 @@ function SiswaTable({ data, setData, currentPage, itemsPerPage }) {
               kelasList.find((k) => k.id === siswa.kelas_id)?.nama_kelas ||
               "Tidak Diketahui";
 
-            const namaRole =
-              roleList.find((r) => r.role_id === siswa.role_id)?.role_name ||
-              "Tidak Diketahui";
-
             return (
               <tr
                 key={siswa.id}
                 className="border-b even:bg-white odd:bg-gray-100"
               >
-                <td className="py-2 px-3 text-center">{siswa.id}</td>
+                <td className="py-2 px-3 text-center">{siswa.nis}</td>
                 <td className="py-2 px-3">{siswa.username}</td>
                 <td className="py-2 px-3">{siswa.password}</td>
                 <td className="py-2 px-3">{siswa.nama_siswa}</td>
@@ -83,7 +78,6 @@ function SiswaTable({ data, setData, currentPage, itemsPerPage }) {
                     ? formatDateNoTime(siswa.tgl_lahir.toString())
                     : "Tidak ada tanggal"}
                 </td>
-                <td className="py-2 px-3">{namaRole}</td>
                 <td className="py-2 px-3">
                   {siswa.created_at
                     ? formatDate(siswa.created_at.toString())

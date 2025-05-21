@@ -143,7 +143,7 @@ const LoginFormSiswa = () => {
               htmlFor="username"
               className="block mb-2 text-md font-bold text-blue-700"
             >
-              Nama Pengguna
+              Username
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -170,7 +170,7 @@ const LoginFormSiswa = () => {
               htmlFor="password"
               className="block mb-2 text-md font-bold text-blue-700"
             >
-              Kata Sandi
+              Password
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">

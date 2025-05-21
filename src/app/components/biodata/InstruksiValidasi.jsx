@@ -14,7 +14,7 @@ function InstruksiValidasi() {
       </p>
       <ol className="list-decimal list-inside space-y-4 text-base text-blue-800 mb-4">
         <li>
-          <span className="block font-bold mb-1">Token Rahasia:</span>
+          <span className="block font-bold mb-1">ID Latihan Rahasia:</span>
           <ul className="list-disc list-inside space-y-1">
             <li>Masukkan kode rahasia yang diberikan gurumu.</li>
             <li>

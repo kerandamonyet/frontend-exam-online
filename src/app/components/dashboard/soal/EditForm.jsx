@@ -401,7 +401,7 @@ function EditForm({ onSubmit, id, initialData }) {
           <label className="block text-sm font-semibold mb-3 text-gray-700">
             Tipe Soal
           </label>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div
               className={`flex items-center p-3 border rounded-md ${
                 formData.tipe_soal === "pilihan_ganda"
@@ -446,29 +446,6 @@ function EditForm({ onSubmit, id, initialData }) {
                 className="ml-2 text-sm font-medium text-gray-900 w-full cursor-pointer"
               >
                 Tarik Garis
-              </label>
-            </div>
-            <div
-              className={`flex items-center p-3 border rounded-md ${
-                formData.tipe_soal === "drag_drop"
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              <input
-                id="radio-drag-drop"
-                type="radio"
-                value="drag_drop"
-                name="tipe_soal"
-                checked={formData.tipe_soal === "drag_drop"}
-                onChange={handleChange}
-                className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="radio-drag-drop"
-                className="ml-2 text-sm font-medium text-gray-900 w-full cursor-pointer"
-              >
-                Drag and Drop
               </label>
             </div>
           </div>

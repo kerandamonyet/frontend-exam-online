@@ -66,7 +66,6 @@ function KelasPage() {
             </h1>
           </div>
           <div className="flex items-center gap-2">
-            <Search />
             <CreateButton onSubmit={fetchKelas} />
           </div>
         </div>

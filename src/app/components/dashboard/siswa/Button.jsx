@@ -1,113 +1,112 @@
+// components/Button.jsx
 "use client";
+
 import { useState } from "react";
+import Swal from "sweetalert2";
 import CreateModal from "./CreateModal";
 import EditModal from "./EditModal";
 import { IoAddSharp, IoPencil, IoTrashOutline } from "react-icons/io5";
-import Swal from "sweetalert2";
-import { getSiswa, deleteSiswa } from "../../../../../lib/data";
+import { deleteSiswa } from "../../../../../lib/data";
 
-export const CreateButton = ({ onSubmit }) => {
-  const [isModalOpen, setModalOpen] = useState(false);
-
+// --- CreateButton (tidak berubah) ---
+export function CreateButton({ onSubmit }) {
+  const [isOpen, setOpen] = useState(false);
   return (
     <>
       <button
-        onClick={() => setModalOpen(true)}
-        className="inline-flex items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 px-5 py-[9px] rounded-sm text-sm"
+        onClick={() => setOpen(true)}
+        className="inline-flex items-center space-x-1 bg-blue-700 hover:bg-blue-800 px-5 py-[9px] rounded-md text-white text-sm shadow-md transition"
       >
         <IoAddSharp size={20} />
-        Create
+        <span>Create</span>
       </button>
       <CreateModal
-        isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)}
-        onSubmit={onSubmit} // Callback untuk update tabel
+        isOpen={isOpen}
+        onClose={() => setOpen(false)}
+        onSubmit={onSubmit}
       />
     </>
   );
-};
+}
 
-export const EditButton = ({ siswa, onUpdate }) => {
-  const [isModalOpen, setModalOpen] = useState(false);
+// --- EditButton: panggil onUpdate setelah modal submit berhasil ---
+export function EditButton({ siswa, onUpdate }) {
+  const [isOpen, setOpen] = useState(false);
 
-  const handleModalClose = () => {
-    console.log("Modal ditutup");
-    setModalOpen(false);
-  };
-
-  const handleModalSubmit = () => {
-    console.log("Modal submit telah berhasil");
-    // Misalnya, panggil fungsi refresh data atau update list dari parent
-    if (onUpdate) {
-      onUpdate();
-    }
-    setModalOpen(false);
+  const handleSubmit = () => {
+    // EditModal diperkirakan sudah memanggil API edit,
+    // kita tinggal refresh list:
+    onUpdate();
+    setOpen(false);
+    Swal.fire({
+      icon: "success",
+      title: "Berhasil",
+      text: "Data siswa berhasil diperbarui.",
+    });
   };
 
   return (
     <>
       <button
-        onClick={() => {
-          console.log("Membuka modal edit");
-          setModalOpen(true);
-        }}
-        className="inline-flex items-center space-x-1 text-white bg-green-700 hover:bg-green-800 px-5 py-[9px] rounded-md text-sm"
+        onClick={() => setOpen(true)}
+        className="inline-flex items-center space-x-1 bg-green-700 hover:bg-green-800 px-5 py-[9px] rounded-md text-white text-sm"
       >
         <IoPencil size={20} />
       </button>
       <EditModal
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
-        onSubmit={handleModalSubmit}
-        siswa={siswa} // Pastikan data siswa sudah tersedia
+        isOpen={isOpen}
+        onClose={() => setOpen(false)}
+        onSubmit={handleSubmit}
+        siswa={siswa}
       />
     </>
   );
-};
+}
 
-export const DeleteButton = ({ id, onDelete }) => {
+// --- DeleteButton: pastikan show success, bukan gagal ---
+export function DeleteButton({ id, onDelete }) {
   const handleDelete = async () => {
-    const result = await Swal.fire({
+    const { isConfirmed } = await Swal.fire({
       title: "Apakah Anda yakin?",
       text: "Data ini akan dihapus secara permanen!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
       confirmButtonText: "Hapus",
       cancelButtonText: "Batal",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
     });
 
-    if (result.isConfirmed) {
-      try {
-        const response = await deleteSiswa(id);
-        if (response.status === 200) {
-          // Tampilkan alert sukses sebelum memperbarui tabel
-          await Swal.fire({
-            icon: "success",
-            title: "Berhasil!",
-            text: "Data siswa berhasil dihapus.",
-          });
-          onDelete(); // Perbarui tabel setelah penghapusan
-        }
-      } catch (error) {
-        console.error("Terjadi kesalahan saat menghapus data siswa", error);
+    if (!isConfirmed) return;
+
+    try {
+      const res = await deleteSiswa(id);
+      if (res?.status === 200) {
         await Swal.fire({
-          icon: "error",
-          title: "Gagal!",
-          text: "Terjadi kesalahan saat menghapus data siswa.",
+          icon: "success",
+          title: "Berhasil",
+          text: "Data siswa berhasil dihapus.",
         });
+        onDelete();
+      } else {
+        throw new Error("Status bukan 200");
       }
+    } catch (err) {
+      console.error("Error hapus siswa:", err);
+      await Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: "Terjadi kesalahan saat menghapus data siswa.",
+      });
     }
   };
 
   return (
     <button
-      type="button"
       onClick={handleDelete}
-      className="inline-flex items-center space-x-1 text-white bg-red-700 hover:bg-red-800 px-5 py-[9px] rounded-md text-sm"
+      className="inline-flex items-center space-x-1 bg-red-700 hover:bg-red-800 px-5 py-[9px] rounded-md text-white text-sm"
     >
       <IoTrashOutline size={20} />
     </button>
   );
-};
+}

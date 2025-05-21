@@ -34,6 +34,7 @@ function FormValidasi({ onSubmitSuccess }) {
       const decoded = jwtDecode(tokenJWT);
       setFormData({
         id_siswa: decoded.id,
+        nis: decoded.nis || "",
         id_latihan: "",
         nama_siswa: decoded.namaSiswa || "",
         jenis_kelamin: decoded.jenisKelamin || "",
@@ -113,6 +114,17 @@ function FormValidasi({ onSubmitSuccess }) {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
+              NIS (Nomor Induk Siswa)
+            </label>
+            <input
+              type="text"
+              value={formData.nis}
+              disabled
+              className="w-full p-2 border border-gray-300 rounded bg-gray-100"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Nama Siswa
             </label>
             <input
@@ -122,7 +134,6 @@ function FormValidasi({ onSubmitSuccess }) {
               className="w-full p-2 border border-gray-300 rounded bg-gray-100"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Jenis Kelamin
@@ -149,7 +160,7 @@ function FormValidasi({ onSubmitSuccess }) {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Token
+              ID Latihan
             </label>
             <input
               type="text"

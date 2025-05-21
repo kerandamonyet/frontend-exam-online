@@ -192,7 +192,7 @@ export default function TentangKami() {
               >
                 <div className="text-4xl mb-2">{subject.icon}</div>
                 <h3 className="text-xl font-bold">{subject.name}</h3>
-                <p className="mt-2 text-sm">100+ soal latihan</p>
+                <p className="mt-2 text-sm">30 soal latihan</p>
                 <button className="mt-4 bg-white text-blue-600 rounded-full px-4 py-2 font-bold text-sm hover:bg-blue-100 transition">
                   Coba Sekarang
                 </button>
@@ -240,34 +240,6 @@ export default function TentangKami() {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="container mx-auto py-12 px-4">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-700 rounded-2xl p-8 text-center text-white shadow-lg relative overflow-hidden">
-          <div className="absolute -top-6 -right-6">
-            <div className="text-6xl animate-bounce-slow">🎓</div>
-          </div>
-          <div className="absolute -bottom-6 -left-6">
-            <div className="text-6xl animate-spin-slow">🎯</div>
-          </div>
-          <h2 className="text-3xl font-bold mb-4 relative z-10">
-            Siap untuk Mulai Belajar?
-          </h2>
-          <p className="mb-6 max-w-2xl mx-auto relative z-10">
-            Bergabunglah dengan teman-teman lainnya yang sudah merasakan manfaat
-            belajar dengan SiapUjian. Mulai latihan sekarang dan raih nilai
-            terbaikmu!
-          </p>
-          <div className="flex justify-center gap-4 flex-wrap">
-            <button className="bg-yellow-400 hover:bg-yellow-500 text-blue-800 font-bold py-3 px-8 rounded-full shadow-lg transform transition-transform hover:scale-105">
-              Daftar Gratis! 🚀
-            </button>
-            <button className="bg-white hover:bg-gray-100 text-blue-600 font-bold py-3 px-8 rounded-full shadow-lg transform transition-transform hover:scale-105">
-              Lihat Demo 👀
-            </button>
           </div>
         </div>
       </div>
