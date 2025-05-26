@@ -5,22 +5,30 @@ import { getLatihan } from "../../../../../lib/data";
 function SortirByLatihan({ onFilter }) {
   const [latihanList, setLatihanList] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Ambil data latihan ketika komponen pertama kali di-render
   useEffect(() => {
     const fetchLatihan = async () => {
       try {
+        setLoading(true);
         const { data: latihanData } = await getLatihan();
+
         if (!latihanData || latihanData.length === 0) {
-          setError("Tidak ada data latihan");
+          setError("Tidak ada data latihan.");
           setLatihanList([]);
         } else {
-          setLatihanList(latihanData);
+          // Urutkan berdasarkan created_at terbaru
+          const sortedData = latihanData.sort(
+            (a, b) => new Date(b.created_at) - new Date(a.created_at)
+          );
+          setLatihanList(sortedData);
           setError(null);
         }
-      } catch (error) {
-        console.error("Gagal mengambil data latihan", error);
-        setError("Gagal mengambil data latihan");
+      } catch (err) {
+        console.error("Gagal mengambil data latihan", err);
+        setError("Gagal mengambil data latihan.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -28,29 +36,32 @@ function SortirByLatihan({ onFilter }) {
   }, []);
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {/* Tombol untuk menampilkan semua soal (reset filter) */}
-      <button
-        onClick={() => onFilter(null)}
-        className="px-3 py-1 bg-blue-100 text-blue-500 rounded-full text-sm hover:bg-blue-200 transition cursor-pointer"
-      >
-        All
-      </button>
-
-      {/* Jika terdapat error, tampilkan pesan error */}
-      {error ? (
-        <div className="px-3 py-1 text-red-500 text-sm">{error}</div>
+    <div className="flex flex-wrap gap-2 items-center">
+      {loading ? (
+        <div className="text-gray-500 text-sm px-3 py-1">Memuat data...</div>
+      ) : error ? (
+        <div className="text-red-500 text-sm px-3 py-1">{error}</div>
       ) : (
-        // Tampilkan daftar latihan sebagai pill
-        latihanList.map((latihan) => (
+        <>
+          {/* Tombol reset filter */}
           <button
-            key={latihan.id_latihan}
-            onClick={() => onFilter(latihan.id_latihan)}
+            onClick={() => onFilter(null)}
             className="px-3 py-1 bg-blue-100 text-blue-500 rounded-full text-sm hover:bg-blue-200 transition cursor-pointer"
           >
-            {latihan.nama_latihan}
+            All
           </button>
-        ))
+
+          {/* Daftar latihan */}
+          {latihanList.map((latihan) => (
+            <button
+              key={latihan.id_latihan}
+              onClick={() => onFilter(latihan.id_latihan)}
+              className="px-3 py-1 bg-blue-100 text-blue-500 rounded-full text-sm hover:bg-blue-200 transition cursor-pointer"
+            >
+              {latihan.nama_latihan}
+            </button>
+          ))}
+        </>
       )}
     </div>
   );

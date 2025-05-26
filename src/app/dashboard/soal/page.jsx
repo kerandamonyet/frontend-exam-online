@@ -24,6 +24,7 @@ function SoalPage() {
   const [soal, setSoal] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filterAktif, setFilterAktif] = useState(false);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,7 +84,7 @@ function SoalPage() {
     setError(null);
     try {
       if (!latihanId) {
-        // Tampilkan semua soal (reset filter)
+        setFilterAktif(false); // Tampilkan semua soal (reset filter)
         const { data, totalPages } = await getAllSoal(
           currentPage,
           itemsPerPage
@@ -91,6 +92,7 @@ function SoalPage() {
         setSoal(data);
         setTotalPages(totalPages);
       } else {
+        setFilterAktif(true);
         // Filter soal sesuai latihan_id
         // (Jika API getSoalByLatihanId tidak mendukung pagination, Anda bisa menonaktifkan pagination)
         const { data } = await getSoalByLatihanId(latihanId);
@@ -181,12 +183,13 @@ function SoalPage() {
               setData={setSoal}
               currentPage={currentPage}
               itemsPerPage={itemsPerPage}
+              loading={loading}
             />
           </div>
         )}
 
         {/* Pagination (opsional, tergantung apakah API filter mendukung pagination) */}
-        {!loading && !error && (
+        {!loading && !error && !filterAktif && (
           <div className="mt-5 flex justify-center">
             <Pagination
               currentPage={currentPage}

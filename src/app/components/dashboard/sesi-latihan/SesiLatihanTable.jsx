@@ -78,6 +78,7 @@ function SesiLatihanTable({ data, setData, currentPage, itemsPerPage }) {
           <th className="py-2 px-3">Waktu Mulai</th>
           <th className="py-2 px-3">Waktu Selesai</th>
           <th className="py-2 px-3">Status</th>
+          <th className="py-2 px-3">Percobaan</th>
           <th className="py-2 px-3">Created At</th>
           <th className="py-2 px-3 text-center">Action</th>
         </tr>
@@ -115,6 +116,7 @@ function SesiLatihanTable({ data, setData, currentPage, itemsPerPage }) {
                 <td className="py-2 px-3">
                   {renderStatus(sesi_latihan.status)}
                 </td>
+                <td className="py-2 px-3">{sesi_latihan.percobaan}</td>
                 <td className="py-2 px-3">
                   {sesi_latihan.created_at
                     ? formatDate(sesi_latihan.created_at.toString())

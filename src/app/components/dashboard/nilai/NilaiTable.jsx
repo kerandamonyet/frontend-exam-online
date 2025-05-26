@@ -6,11 +6,13 @@ import {
   getHasilByLatihan,
   getLatihan,
   getSiswa,
+  getAllSesiLatihan,
 } from "../../../../../lib/data";
 
 function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
   const [latihanList, setLatihanList] = useState([]);
   const [siswaList, setSiswaList] = useState([]);
+  const [percobaanList, setPercobaanList] = useState([]);
 
   useEffect(() => {
     const fetchLatihan = async () => {
@@ -31,8 +33,18 @@ function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
       }
     };
 
+    const fetchPercobaan = async () => {
+      try {
+        const { data } = await getAllSesiLatihan();
+        setPercobaanList(data);
+      } catch (error) {
+        console.error("Gagal mengambil data percobaan", error);
+      }
+    };
+
     fetchLatihan();
     fetchSiswa();
+    fetchPercobaan();
   }, []);
 
   const handleDelete = async () => {
@@ -49,7 +61,6 @@ function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
       <thead className="text-xs text-gray-700 uppercase bg-gray-50">
         <tr>
           <th className="py-2 px-3">No</th>
-          <th className="py-2 px-3">ID</th>
           <th className="py-2 px-3">Nama Siswa</th>
           <th className="py-2 px-3">Nama Latihan</th>
           <th className="py-2 px-3 text-center">Total Soal</th>
@@ -57,6 +68,7 @@ function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
           <th className="py-2 px-3 text-center">Salah</th>
           <th className="py-2 px-3 text-center">Soal dijawab</th>
           <th className="py-2 px-3 text-center">Skor</th>
+          <th className="py-2 px-3 text-center">Percobaan</th>
           <th className="py-2 px-3">Created At</th>
           {/* <th className="py-2 px-3 text-center">Action</th> */}
         </tr>
@@ -72,6 +84,9 @@ function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
             const namaSiswa =
               siswaList.find((s) => s.id === nilai.siswa_id)?.nama_siswa ||
               "Tidak Diketahui";
+            const percobaan =
+              percobaanList.find((p) => p.id === nilai.id_sesi)?.percobaan ||
+              "Tidak Diketahui";
 
             return (
               <tr
@@ -79,14 +94,16 @@ function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
                 className="border-b even:bg-white odd:bg-gray-100"
               >
                 <td className="py-2 px-3 text-center">{rowNumber}</td>
-                <td className="py-2 px-3">{nilai.id}</td>
                 <td className="py-2 px-3">{namaSiswa}</td>
                 <td className="py-2 px-3">{namaLatihan}</td>
                 <td className="py-2 px-3 text-center">30</td>
                 <td className="py-2 px-3 text-center">{nilai.benar}</td>
                 <td className="py-2 px-3 text-center">{nilai.salah}</td>
                 <td className="py-2 px-3 text-center">{nilai.total_soal}</td>
-                <td className="py-2 px-3 text-center font-bold">{nilai.skor}</td>
+                <td className="py-2 px-3 text-center font-bold">
+                  {nilai.skor}
+                </td>
+                <td className="py-2 px-3 text-center font-bold">{percobaan}</td>
                 <td className="py-2 px-3">
                   {nilai.created_at
                     ? formatDate(nilai.created_at.toString())
