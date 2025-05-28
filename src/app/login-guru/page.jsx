@@ -11,23 +11,23 @@ const LoginFormGuru = () => {
   const router = useRouter();
   const MySwal = withReactContent(Swal);
 
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({ username: "", password: "" });
   const [pending, setPending] = useState(false);
 
   // Validasi form
   const validateForm = () => {
     let valid = true;
-    let newErrors = { email: "", password: "" };
+    let newErrors = { username: "", password: "" };
 
-    if (!email) {
-      newErrors.email = "Email tidak boleh kosong.";
+    if (!username) {
+      newErrors.username = "username tidak boleh kosong.";
       valid = false;
     } else if (
-      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(username)
     ) {
-      newErrors.email = "Format email tidak valid.";
+      newErrors.username = "Format username tidak valid.";
       valid = false;
     }
 
@@ -62,13 +62,13 @@ const LoginFormGuru = () => {
     if (!validateForm()) return;
 
     setPending(true);
-    console.log("🔄 [LOGIN] Mengirim data:", { email, password });
+    console.log("🔄 [LOGIN] Mengirim data:", { username, password });
 
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
         {
-          email,
+          username,
           password,
         }
       );
@@ -87,7 +87,7 @@ const LoginFormGuru = () => {
         text: "Login berhasil!",
       });
 
-      router.push("/guru");
+      router.push("/dashboard");
     } catch (error) {
       console.error("❌ [LOGIN] Error:", error.response?.data || error.message);
       MySwal.fire({
@@ -106,34 +106,34 @@ const LoginFormGuru = () => {
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <h5 className="text-xl font-medium text-gray-900">
+          <h5 className="text-xl font-bold text-gray-900">
             Login ke dashboard guru
           </h5>
           <div>
             <label
-              htmlFor="email"
-              className="block mb-2 text-sm font-medium text-gray-900"
+              htmlFor="username"
+              className="block mb-2 text-sm font-bold text-gray-900"
             >
-              Email
+              Username
             </label>
             <input
-              type="email"
-              name="email"
-              id="email"
+              type="username"
+              name="username"
+              id="username"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              placeholder="nama@school.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="example@gmail.com"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
             />
-            {errors.email && (
-              <p className="text-sm text-red-600">{errors.email}</p>
+            {errors.username && (
+              <p className="text-sm text-red-600">{errors.username}</p>
             )}
           </div>
           <div>
             <label
               htmlFor="password"
-              className="block mb-2 text-sm font-medium text-gray-900"
+              className="block mb-2 text-sm font-bold text-gray-900"
             >
               Password
             </label>
