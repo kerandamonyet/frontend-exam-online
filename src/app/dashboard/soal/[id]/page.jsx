@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import EditForm from "@/app/components/dashboard/soal/EditForm";
-import { getSoalByIdSoal } from "../../../../../../lib/data";
+import { getSoalByIdSoal } from "../../../../../lib/data";
 
 function EditSoalPage() {
   const router = useRouter();
