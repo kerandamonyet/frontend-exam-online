@@ -1,3 +1,6 @@
+// app/layout.jsx
+
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./globals.css";
@@ -14,12 +17,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <link rel="logo" href="/logo4.png" />
+        <link rel="icon" href="/logo4.png" />
       </head>
       <body>
         {/* <Navbar /> */}
         {children}
         {/* <Footer /> */}
+        <SpeedInsights />
       </body>
     </html>
   );
