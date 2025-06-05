@@ -98,7 +98,7 @@ export default function HasilSiswaClient({ data }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="border-2 rounded-xl p-4 bg-blue-50 border-blue-200 text-center">
                 <h3 className="text-lg text-blue-600 mb-1 font-medium">
-                  Soal yang dijawab
+                  Total Soal
                 </h3>
                 <p className="text-4xl font-bold text-blue-700">
                   {data.total_soal}

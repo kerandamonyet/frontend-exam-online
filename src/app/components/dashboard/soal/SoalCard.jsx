@@ -36,6 +36,87 @@ function SoalCard({ data = [], setData, currentPage, itemsPerPage, loading }) {
   );
 
   const renderQuestionContent = (soal) => {
+    if (soal.tipe_soal === "tarik_garis") {
+      // Parse data_tarik_garis jika berupa string
+      let dataTarikGaris;
+      try {
+        dataTarikGaris =
+          typeof soal.data_tarik_garis === "string"
+            ? JSON.parse(soal.data_tarik_garis)
+            : soal.data_tarik_garis;
+      } catch (err) {
+        console.error("Gagal parsing data_tarik_garis:", err);
+        dataTarikGaris = {};
+      }
+
+      const {
+        opsi_kiri = [],
+        opsi_kanan = [],
+        jawaban_benar = {},
+      } = dataTarikGaris;
+
+      return (
+        <div>
+          <p className="font-medium">
+            <span className="font-bold">Soal {soal.nomorSoal}.</span>{" "}
+            {renderHTML(soal.text_soal)}
+          </p>
+
+          <div className="grid grid-cols-2 gap-4 mt-2">
+            <div>
+              <p className="text-sm font-semibold text-purple-700">Opsi Kiri</p>
+              <ul className="list-disc ml-5 text-sm text-gray-800">
+                {opsi_kiri.map((item, index) => (
+                  <li key={`kiri-${index}`}>{renderHTML(item)}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-purple-700">
+                Opsi Kanan
+              </p>
+              <ul className="list-disc ml-5 text-sm text-gray-800">
+                {opsi_kanan.map((item, index) => (
+                  <li key={`kanan-${index}`}>{renderHTML(item)}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <p className="mt-2 text-sm text-green-600 font-semibold">
+            Jawaban Benar:
+          </p>
+          <ul className="text-sm text-green-700 ml-4 list-disc">
+            {(() => {
+              // Cek apakah jawaban_benar ada dan berisi data
+              if (
+                jawaban_benar &&
+                typeof jawaban_benar === "object" &&
+                Object.keys(jawaban_benar).length > 0
+              ) {
+                return Object.entries(jawaban_benar).map(
+                  ([kiri, kanan], index) => (
+                    <li key={index}>
+                      <span className="font-medium">{kiri}</span> →{" "}
+                      <span className="font-medium">{kanan}</span>
+                    </li>
+                  )
+                );
+              }
+
+              return (
+                <li className="italic text-gray-500">Belum ada jawaban</li>
+              );
+            })()}
+          </ul>
+
+          <p className="text-xs text-gray-400 mt-1">
+            Dibuat pada: {formatDate(soal.created_at)}
+          </p>
+        </div>
+      );
+    }
+    // Default: pilihan ganda
     return (
       <div>
         <p className="font-medium">
@@ -102,7 +183,10 @@ function SoalCard({ data = [], setData, currentPage, itemsPerPage, loading }) {
                   {renderQuestionContent(soal)}
                   <div className="mt-3 flex gap-2">
                     <EditButton id={soal.id} />
-                    <DeleteButton soalId={soal.id} setData={setData} />
+                    <DeleteButton
+                      id={soal.id}
+                      onDelete={() => handleDelete(soal.id)}
+                    />
                   </div>
                 </div>
               ))}

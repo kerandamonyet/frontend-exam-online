@@ -1,6 +1,6 @@
 // app/layout.jsx
 
-import { SpeedInsights } from "@vercel/speed-insights/next";
+// import { SpeedInsights } from "@vercel/speed-insights/next";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./globals.css";
@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
         {/* <Navbar /> */}
         {children}
         {/* <Footer /> */}
-        <SpeedInsights />
+        {/* <SpeedInsights /> */}
       </body>
     </html>
   );

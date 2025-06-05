@@ -140,7 +140,7 @@ export default function SoalPage() {
         .then((response) => {
           const data = response.data.data || [];
           // Limit to only 30 questions
-          let limitedData = Array.isArray(data) ? data.slice(0, 30) : [];
+          let limitedData = Array.isArray(data) ? data.slice(0, 20) : [];
 
           // Only shuffle questions if we don't have saved questions
           // This ensures question order remains the same after refresh

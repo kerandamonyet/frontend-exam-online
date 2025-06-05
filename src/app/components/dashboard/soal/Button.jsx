@@ -51,6 +51,9 @@ export const DeleteButton = ({ id, onDelete }) => {
             text: "Data latihan berhasil dihapus.",
           });
           onDelete(); // Memperbarui daftar/tabel setelah penghapusan
+          router.push("/dashboard/soal");
+          const updated = data.filter((item) => item.id !== deletedId);
+          setData(updated); // update langsung
         }
       } catch (error) {
         console.error("Terjadi kesalahan saat menghapus data latihan", error);

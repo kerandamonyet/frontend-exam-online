@@ -6,13 +6,15 @@ import {
   getHasilByLatihan,
   getLatihan,
   getSiswa,
-  getAllSesiLatihan,
+  getSesiLatihan,
+  getKelas,
 } from "../../../../../lib/data";
 
 function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
   const [latihanList, setLatihanList] = useState([]);
   const [siswaList, setSiswaList] = useState([]);
-  const [percobaanList, setPercobaanList] = useState([]);
+  const [kelasList, setKelasList] = useState([]);
+  const [sortOrder, setSortOrder] = useState("desc"); // default urut dari tertinggi
 
   useEffect(() => {
     const fetchLatihan = async () => {
@@ -32,19 +34,18 @@ function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
         console.error("Gagal mengambil data siswa", error);
       }
     };
-
-    const fetchPercobaan = async () => {
+    const fetchKelas = async () => {
       try {
-        const { data } = await getAllSesiLatihan();
-        setPercobaanList(data);
+        const { data } = await getKelas();
+        setKelasList(data);
       } catch (error) {
-        console.error("Gagal mengambil data percobaan", error);
+        console.error("Gagal mengambil data kelas", error);
       }
     };
 
     fetchLatihan();
     fetchSiswa();
-    fetchPercobaan();
+    fetchKelas();
   }, []);
 
   const handleDelete = async () => {
@@ -62,12 +63,18 @@ function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
         <tr>
           <th className="py-2 px-3">No</th>
           <th className="py-2 px-3">Nama Siswa</th>
+          <th className="py-2 px-3">Kelas</th>
           <th className="py-2 px-3">Nama Latihan</th>
           <th className="py-2 px-3 text-center">Total Soal</th>
           <th className="py-2 px-3 text-center">Benar</th>
           <th className="py-2 px-3 text-center">Salah</th>
-          <th className="py-2 px-3 text-center">Soal dijawab</th>
-          <th className="py-2 px-3 text-center">Skor</th>
+          <th
+            className="py-2 px-3 text-center cursor-pointer"
+            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+          >
+            Skor
+            <span className="ml-1">{sortOrder === "asc" ? "↑" : "↓"}</span>
+          </th>
           <th className="py-2 px-3 text-center">Percobaan</th>
           <th className="py-2 px-3">Created At</th>
           {/* <th className="py-2 px-3 text-center">Action</th> */}
@@ -75,46 +82,46 @@ function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
       </thead>
       <tbody>
         {data && data.length > 0 ? (
-          data.map((nilai, index) => {
-            // Hitung nomor urut berdasarkan currentPage dan itemsPerPage
-            const rowNumber = (currentPage - 1) * itemsPerPage + index + 1;
-            const namaLatihan =
-              latihanList.find((l) => l.id_latihan === nilai.latihan_id)
-                ?.nama_latihan || "Tidak Diketahui";
-            const namaSiswa =
-              siswaList.find((s) => s.id === nilai.siswa_id)?.nama_siswa ||
-              "Tidak Diketahui";
-            const percobaan =
-              percobaanList.find((p) => p.id === nilai.id_sesi)?.percobaan ||
-              "Tidak Diketahui";
+          [...data]
+            .sort((a, b) =>
+              sortOrder === "asc" ? a.skor - b.skor : b.skor - a.skor
+            )
+            .map((nilai, index) => {
+              const rowNumber = (currentPage - 1) * itemsPerPage + index + 1;
+              const namaLatihan =
+                latihanList.find((l) => l.id_latihan === nilai.latihan_id)
+                  ?.nama_latihan || "Tidak Diketahui";
+              const siswa = siswaList.find((s) => s.id === nilai.siswa_id);
+              const namaSiswa = siswa?.nama_siswa || "Tidak Diketahui";
+              const kelas = kelasList.find((k) => k.id === siswa?.kelas_id);
+              const namaKelas = kelas?.nama_kelas || "Tidak Diketahui";
 
-            return (
-              <tr
-                key={nilai.id}
-                className="border-b even:bg-white odd:bg-gray-100"
-              >
-                <td className="py-2 px-3 text-center">{rowNumber}</td>
-                <td className="py-2 px-3">{namaSiswa}</td>
-                <td className="py-2 px-3">{namaLatihan}</td>
-                <td className="py-2 px-3 text-center">30</td>
-                <td className="py-2 px-3 text-center">{nilai.benar}</td>
-                <td className="py-2 px-3 text-center">{nilai.salah}</td>
-                <td className="py-2 px-3 text-center">{nilai.total_soal}</td>
-                <td className="py-2 px-3 text-center font-bold">
-                  {nilai.skor}
-                </td>
-                <td className="py-2 px-3 text-center font-bold">{percobaan}</td>
-                <td className="py-2 px-3">
-                  {nilai.created_at
-                    ? formatDate(nilai.created_at.toString())
-                    : "Tidak ada tanggal"}
-                </td>
-                {/* <td className="flex justify-center gap-1 py-2 px-3">
-                  <DeleteButton id={nilai.id} onDelete={handleDelete} />
-                </td> */}
-              </tr>
-            );
-          })
+              return (
+                <tr
+                  key={nilai.id}
+                  className="border-b even:bg-white odd:bg-gray-100"
+                >
+                  <td className="py-2 px-3 text-center">{rowNumber}</td>
+                  <td className="py-2 px-3">{namaSiswa}</td>
+                  <td className="py-2 px-3 text-center">{namaKelas}</td>
+                  <td className="py-2 px-3">{namaLatihan}</td>
+                  <td className="py-2 px-3 text-center">20</td>
+                  <td className="py-2 px-3 text-center">{nilai.benar}</td>
+                  <td className="py-2 px-3 text-center">{nilai.salah}</td>
+                  <td className="py-2 px-3 text-center font-bold">
+                    {nilai.skor}
+                  </td>
+                  <td className="py-2 px-3 text-center font-bold">
+                    {nilai.percobaan}
+                  </td>
+                  <td className="py-2 px-3">
+                    {nilai.created_at
+                      ? formatDate(nilai.created_at.toString())
+                      : "Tidak ada tanggal"}
+                  </td>
+                </tr>
+              );
+            })
         ) : (
           <tr>
             <td colSpan="9" className="text-center py-4">

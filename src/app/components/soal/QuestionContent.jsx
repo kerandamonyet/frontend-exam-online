@@ -286,13 +286,6 @@ export default function QuestionContent({
           )}
         </div>
       );
-    } else if (currentSoal.tipe_soal === "drag_drop") {
-      // Placeholder for drag and drop questions
-      return (
-        <div className="p-4 bg-gray-100 rounded-lg text-center">
-          <p>Soal tipe drag & drop belum didukung.</p>
-        </div>
-      );
     } else {
       // Default case for unknown question types
       return (
