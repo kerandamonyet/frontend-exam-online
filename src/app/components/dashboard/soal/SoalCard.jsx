@@ -65,7 +65,7 @@ function SoalCard({ data = [], setData, currentPage, itemsPerPage, loading }) {
           <div className="grid grid-cols-2 gap-4 mt-2">
             <div>
               <p className="text-sm font-semibold text-purple-700">Opsi Kiri</p>
-              <ul className="list-disc ml-5 text-sm text-gray-800">
+              <ul className="list-none ml-5 text-sm text-gray-800">
                 {opsi_kiri.map((item, index) => (
                   <li key={`kiri-${index}`}>{renderHTML(item)}</li>
                 ))}
@@ -75,7 +75,7 @@ function SoalCard({ data = [], setData, currentPage, itemsPerPage, loading }) {
               <p className="text-sm font-semibold text-purple-700">
                 Opsi Kanan
               </p>
-              <ul className="list-disc ml-5 text-sm text-gray-800">
+              <ul className="list-none ml-5 text-sm text-gray-800">
                 {opsi_kanan.map((item, index) => (
                   <li key={`kanan-${index}`}>{renderHTML(item)}</li>
                 ))}
@@ -86,7 +86,7 @@ function SoalCard({ data = [], setData, currentPage, itemsPerPage, loading }) {
           <p className="mt-2 text-sm text-green-600 font-semibold">
             Jawaban Benar:
           </p>
-          <ul className="text-sm text-green-700 ml-4 list-disc">
+          <ul className="text-sm text-green-700 ml-4 list-none">
             {(() => {
               // Cek apakah jawaban_benar ada dan berisi data
               if (
@@ -123,7 +123,7 @@ function SoalCard({ data = [], setData, currentPage, itemsPerPage, loading }) {
           <span className="font-bold">Soal {soal.nomorSoal}.</span>{" "}
           {renderHTML(soal.text_soal)}
         </p>
-        <ul className="mt-1 ml-4 list-disc text-sm text-gray-700 space-y-1">
+        <ul className="  mt-1 ml-4 list-none text-sm text-gray-700 space-y-1">
           <li>
             <strong>A.</strong> {renderHTML(soal.opsi_a)}
           </li>

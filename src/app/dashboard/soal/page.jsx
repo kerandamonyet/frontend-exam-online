@@ -19,6 +19,7 @@ import { TbClipboardList, TbUsers } from "react-icons/tb";
 import { HiOutlinePencilAlt } from "react-icons/hi";
 import { BiLoaderAlt } from "react-icons/bi";
 import { FaRegQuestionCircle } from "react-icons/fa";
+import { ScrollToTopButton } from "@/app/components/dashboard/soal/ScrollToTopButton";
 
 function SoalPage() {
   const [soal, setSoal] = useState([]);
@@ -161,6 +162,7 @@ function SoalPage() {
         <div className="mt-4">
           <SortirByLatihan onFilter={handleFilterSoalByLatihan} />
         </div>
+        <ScrollToTopButton />
 
         {/* Loading & Error Handling */}
         {loading && (
