@@ -3,7 +3,7 @@ import { FaClock, FaUserGraduate } from "react-icons/fa";
 export default function Header({ timeLeft, studentName }) {
   // Format time as mm:ss
   const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
+    const mins = Math.floor(seconds / 120);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
