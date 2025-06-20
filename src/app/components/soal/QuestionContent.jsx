@@ -128,6 +128,13 @@ export default function QuestionContent({
     setSelectedLeft(null);
   };
 
+  // Menambahkan Log ID Soal
+  useEffect(() => {
+    if (currentSoal && currentSoal.id) {
+      console.log(`[LOG] Menampilkan soal ID: ${currentSoal.id}`);
+    }
+  }, [currentSoal]);
+
   // Render content based on question type
   const renderQuestionContent = () => {
     if (currentSoal.tipe_soal === "pilihan_ganda") {

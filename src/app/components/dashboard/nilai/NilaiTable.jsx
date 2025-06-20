@@ -15,6 +15,7 @@ function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
   const [siswaList, setSiswaList] = useState([]);
   const [kelasList, setKelasList] = useState([]);
   const [sortOrder, setSortOrder] = useState("desc"); // default urut dari tertinggi
+  const [timeSortOrder, setTimeSortOrder] = useState("desc");
 
   useEffect(() => {
     const fetchLatihan = async () => {
@@ -76,16 +77,27 @@ function NilaiTable({ data, setData, currentPage, itemsPerPage }) {
             <span className="ml-1">{sortOrder === "asc" ? "↑" : "↓"}</span>
           </th>
           <th className="py-2 px-3 text-center">Percobaan</th>
-          <th className="py-2 px-3">Created At</th>
+          <th
+            className="py-2 px-3 cursor-pointer"
+            onClick={() =>
+              setTimeSortOrder(timeSortOrder === "asc" ? "desc" : "asc")
+            }
+          >
+            Created At
+            <span className="ml-1">{timeSortOrder === "asc" ? "↑" : "↓"}</span>
+          </th>
           {/* <th className="py-2 px-3 text-center">Action</th> */}
         </tr>
       </thead>
       <tbody>
         {data && data.length > 0 ? (
           [...data]
-            .sort((a, b) =>
-              sortOrder === "asc" ? a.skor - b.skor : b.skor - a.skor
-            )
+            .sort((a, b) => {
+              const dateA = new Date(a.created_at);
+              const dateB = new Date(b.created_at);
+              return timeSortOrder === "asc" ? dateA - dateB : dateB - dateA;
+            })
+
             .map((nilai, index) => {
               const rowNumber = (currentPage - 1) * itemsPerPage + index + 1;
               const namaLatihan =

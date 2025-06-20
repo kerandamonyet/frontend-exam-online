@@ -9,7 +9,7 @@ function BiodataPage() {
   const router = useRouter();
 
   const handleSubmitSuccess = (id_latihan) => {
-    router.push(`/soal/${id_latihan}`);
+    router.push(`/latihan/${id_latihan}`);
   };
 
   return (
