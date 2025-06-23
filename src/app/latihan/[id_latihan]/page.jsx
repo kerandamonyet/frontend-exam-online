@@ -94,12 +94,13 @@ export default function SoalPage() {
   // Load questions and restore state from session storage
   useEffect(() => {
     if (id_latihan) {
-      // Restore saved state from session storage first
       const storageKey = `quiz_${id_latihan}`;
+      const usedQuestionsKey = `used_questions_${id_latihan}`; // <== NEW
       const savedState = getFromStorage(storageKey, null);
+      const usedQuestions = getFromStorage(usedQuestionsKey, []); // <== NEW
 
       if (savedState) {
-        // Restore all saved state
+        // Restore saved state
         setFormData((prev) => ({
           ...prev,
           jawaban_siswa: savedState.jawaban_siswa || {},
@@ -110,25 +111,21 @@ export default function SoalPage() {
         setStartTime(savedState.startTime);
         setSubmitted(savedState.submitted || false);
 
-        // If we have saved questions, use those to maintain question order
         if (savedState.questions && savedState.questions.length > 0) {
           setSoal(savedState.questions);
         }
 
-        // Calculate remaining time based on saved start time
         if (savedState.startTime) {
           const elapsedSeconds = Math.floor(
             (Date.now() - savedState.startTime) / 1000
           );
           const remaining = Math.max(0, 60 * 60 - elapsedSeconds);
           setTimeLeft(remaining);
-          // If time already expired while away
           if (remaining <= 0 && !savedState.submitted) {
             setIsTimerExpired(true);
           }
         }
       } else {
-        // If no saved state, set the start time now
         const now = Date.now();
         setStartTime(now);
         saveToStorage(storageKey, { startTime: now });
@@ -138,24 +135,33 @@ export default function SoalPage() {
       axios
         .get(`http://localhost:5000/api/latihan/${id_latihan}/soal`)
         .then((response) => {
-          const data = response.data.data || [];
-          // Limit to only 30 questions
-          let limitedData = Array.isArray(data) ? data.slice(0, 20) : [];
+          const allQuestions = response.data.data || [];
 
-          // Only shuffle questions if we don't have saved questions
-          // This ensures question order remains the same after refresh
+          // Filter out used questions
+          const newQuestions = allQuestions.filter(
+            (q) => !usedQuestions.includes(q.id)
+          );
+
+          // Limit and shuffle
+          let limitedData = fisherYatesShuffle([...newQuestions]).slice(0, 20);
+
           if (
             !savedState ||
             !savedState.questions ||
             savedState.questions.length === 0
           ) {
-            limitedData = fisherYatesShuffle(limitedData);
-
-            // Save the shuffled questions to storage
+            // Save shuffled questions
             saveToStorage(storageKey, {
               ...getFromStorage(storageKey, {}),
               questions: limitedData,
             });
+
+            // Save used question IDs (add to previous ones)
+            const updatedUsedIds = [
+              ...usedQuestions,
+              ...limitedData.map((q) => q.id),
+            ];
+            saveToStorage(usedQuestionsKey, updatedUsedIds);
           }
 
           setSoal(limitedData);
