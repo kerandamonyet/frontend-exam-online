@@ -7,6 +7,7 @@ import { formatDateNoTime } from "../../../../../utils/formatDateNotime";
 function SiswaTable({ data, setData, currentPage, itemsPerPage }) {
   const [kelasList, setKelasList] = useState([]);
   const [roleList, setRoleList] = useState([]);
+  const [sortOrder, setSortOrder] = useState("desc"); // default urut dari Z-A
 
   useEffect(() => {
     const fetchKelas = async () => {
@@ -40,6 +41,18 @@ function SiswaTable({ data, setData, currentPage, itemsPerPage }) {
     }
   };
 
+  // Tambahkan ini sebelum `return` dalam komponen SiswaTable
+  const sortedData = [...data].sort((a, b) => {
+    const kelasA = kelasList.find((k) => k.id === a.kelas_id)?.nama_kelas || "";
+    const kelasB = kelasList.find((k) => k.id === b.kelas_id)?.nama_kelas || "";
+
+    if (sortOrder === "asc") {
+      return kelasA.localeCompare(kelasB);
+    } else {
+      return kelasB.localeCompare(kelasA);
+    }
+  });
+
   return (
     <table className="w-full text-xs text-left text-gray-500">
       <thead className="text-xs text-gray-700 uppercase bg-gray-50">
@@ -48,7 +61,13 @@ function SiswaTable({ data, setData, currentPage, itemsPerPage }) {
           <th className="py-2 px-3">Username</th>
           <th className="py-2 px-3">Password</th>
           <th className="py-2 px-3">Nama</th>
-          <th className="py-2 px-3">Kelas</th>
+          <th
+            className="py-2 px-3 text-center cursor-pointer"
+            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+          >
+            Kelas
+            <span className="ml-1">{sortOrder === "asc" ? "↑" : "↓"}</span>
+          </th>{" "}
           <th className="py-2 px-3">Jenis Kelamin</th>
           <th className="py-2 px-3">Tanggal Lahir</th>
           <th className="py-2 px-3">Created At</th>
@@ -56,8 +75,8 @@ function SiswaTable({ data, setData, currentPage, itemsPerPage }) {
         </tr>
       </thead>
       <tbody>
-        {data.length > 0 ? (
-          data.map((siswa) => {
+        {sortedData.length > 0 ? (
+          sortedData.map((siswa) => {
             const namaKelas =
               kelasList.find((k) => k.id === siswa.kelas_id)?.nama_kelas ||
               "Tidak Diketahui";
